@@ -1,0 +1,18 @@
+{
+  "type": "oniutils:blueprint",
+  "inputs": [
+    {
+      "item": {
+        "item": "minecraft:iron_ingot"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "tag": "minecraft:planks"
+      },
+      "count": 1
+    }
+  ],
+  "output": "oniutils:coal_generator"
+}

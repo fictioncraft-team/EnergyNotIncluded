@@ -1,0 +1,11 @@
+{
+  "coal_generator": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "oniutils:coal_generator",
+        "stream": true
+      }
+    ]
+  }
+}
