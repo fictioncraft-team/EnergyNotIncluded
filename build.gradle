@@ -66,6 +66,13 @@ repositories {
         }
     }
 
+    maven {
+        url = "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup("com.github.wintersteve25.tau")
+        }
+    }
+
     mavenLocal()
 }
 
@@ -89,7 +96,7 @@ dependencies {
 //    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.9.0:api")
 
     // tau
-//    implementation fg.deobf("com.github.wintersteve25:Tau:1.0.2-1.18")
+    implementation "com.github.wintersteve25.tau:Tau:2.0.0"
 }
 
 tasks.withType(ProcessResources).configureEach {
