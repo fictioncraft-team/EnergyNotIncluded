@@ -1,8 +1,8 @@
 package com.github.wintersteve25.energynotincluded.common.utils.helpers;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
 
 public class ModelFileHelper {
     public static ModelFile createModelFile(ResourceLocation location, boolean exists) {

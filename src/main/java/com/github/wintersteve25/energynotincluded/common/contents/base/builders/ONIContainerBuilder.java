@@ -1,16 +1,17 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.builders;
 
-import mekanism.common.registration.impl.ContainerTypeRegistryObject;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.util.Tuple;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.network.IContainerFactory;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.utils.SlotArrangement;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.network.IContainerFactory;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +30,7 @@ public class ONIContainerBuilder {
     private Tuple<Integer, Integer> playerSlotStart = new Tuple<>(8, 88);
 
     private final String regName;
-    private final ContainerTypeRegistryObject<ONIAbstractContainer> registryObject;
+    private final DeferredHolder<MenuType<?>, MenuType<ONIAbstractContainer>> registryObject;
 
     public ONIContainerBuilder(String regName) {
         this.regName = regName;
@@ -81,12 +82,12 @@ public class ONIContainerBuilder {
         return this;
     }
 
-    private ContainerTypeRegistryObject<ONIAbstractContainer> buildContainerType() {
-        return ONIBlocks.MENUS.register(MiscHelper.langToReg(regName), () -> IForgeMenuType.create(buildFactory()));
+    private DeferredHolder<MenuType<?>, MenuType<ONIAbstractContainer>> buildContainerType() {
+        return ONIBlocks.MENUS.register(MiscHelper.langToReg(regName), () -> IMenuTypeExtension.create(buildFactory()));
     }
 
     public IContainerFactory<ONIAbstractContainer> buildFactory() {
-        return (windowId, inv, data) -> buildNewInstance(windowId, inv.player.level, data.readBlockPos(), inv, inv.player);
+        return (windowId, inv, data) -> buildNewInstance(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
     }
 
     public ONIAbstractContainer buildNewInstance(int windowID, Level world, BlockPos pos, Inventory playerInventory, Player player) {
@@ -109,7 +110,7 @@ public class ONIContainerBuilder {
         );
     }
 
-    public ContainerTypeRegistryObject<ONIAbstractContainer> getContainerTypeRegistryObject() {
+    public DeferredHolder<MenuType<?>, MenuType<ONIAbstractContainer>> getContainerTypeRegistryObject() {
         return registryObject;
     }
 }

@@ -25,7 +25,7 @@ public class ONIUtils {
         final IEventBus forgeEventBus = NeoForge.EVENT_BUS;
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ONIConfig.Server.SERVER_CONFIG);
-        Registration.init();
+        Registration.init(modEventBus);
 
         modEventBus.addListener(ONIServerEventsHandler::commonSetup);
         forgeEventBus.addListener(ONIServerEventsHandler::command);

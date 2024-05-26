@@ -1,6 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.registration.block;
 
-import net.minecraftforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
 
 public class ONIDirectionalBlockRegistryData extends ONIBlockRegistryData {
     private final int angleOffset;

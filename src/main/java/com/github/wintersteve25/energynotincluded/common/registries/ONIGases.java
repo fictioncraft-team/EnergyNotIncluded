@@ -6,6 +6,7 @@ import mekanism.common.registration.impl.GasRegistryObject;
 import net.minecraftforge.eventbus.api.IEventBus;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.data.capabilities.world_gas.api.chemistry.Element;
+import net.neoforged.bus.api.IEventBus;
 
 import java.util.ArrayList;
 import java.util.List;

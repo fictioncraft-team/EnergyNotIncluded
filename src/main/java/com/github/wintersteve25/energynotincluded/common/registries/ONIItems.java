@@ -1,11 +1,9 @@
 package com.github.wintersteve25.energynotincluded.common.registries;
 
 import com.github.wintersteve25.energynotincluded.common.contents.modules.items.gadgets.blueprint.ONIBlueprintItem;
-import mekanism.common.registration.impl.ItemRegistryObject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.eventbus.api.IEventBus;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseItem;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseItemArmor;
@@ -15,15 +13,17 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.enums.Enu
 import com.github.wintersteve25.energynotincluded.common.contents.modules.items.gadgets.ONIToolItems;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ONIModificationItem;
 import com.github.wintersteve25.energynotincluded.common.registration.item.ONIItemDeferredRegister;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class ONIItems {
 
     public static final ONIItemDeferredRegister ITEMS = new ONIItemDeferredRegister(ONIUtils.MODID);
 
     public static class Gadgets {
-        public static final ItemRegistryObject<ONIBaseItemArmor> GAS_GOGGLES = registerBuilder(ONIToolItems.GAS_GOGGLES);
-        public static final ItemRegistryObject<ONIBaseItem> WIRE_CUTTER = registerBuilder(ONIToolItems.WIRE_CUTTER);
-        public static final ItemRegistryObject<ONIBlueprintItem> BLUEPRINT = registerBuilder(ONIToolItems.BLUEPRINT);
+        public static final DeferredHolder<Item, ONIBaseItemArmor> GAS_GOGGLES = registerBuilder(ONIToolItems.GAS_GOGGLES);
+        public static final DeferredHolder<Item, ONIBaseItem> WIRE_CUTTER = registerBuilder(ONIToolItems.WIRE_CUTTER);
+        public static final DeferredHolder<Item, ONIBlueprintItem> BLUEPRINT = registerBuilder(ONIToolItems.BLUEPRINT);
 
         private static void register() {
         }
@@ -47,7 +47,7 @@ public class ONIItems {
         ITEMS.register(regName, () -> new ONIModificationItem(ONIUtils.defaultProperties().stacksTo(1).setNoRepair(), color, maxBonus, modType, tooltips));
     }
 
-    private static <T extends Item & ONIIItem> ItemRegistryObject<T> registerBuilder(ONIItemBuilder<T> builder) {
+    private static <T extends Item & ONIIItem> DeferredHolder<Item, T> registerBuilder(ONIItemBuilder<T> builder) {
         return ITEMS.register(builder.getRegName(), () -> builder.build().apply(null), builder.isDoModelGen(), builder.isDoLangGen());
     }
 }
