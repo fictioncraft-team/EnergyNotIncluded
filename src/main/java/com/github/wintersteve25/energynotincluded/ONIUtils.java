@@ -1,6 +1,5 @@
 package com.github.wintersteve25.energynotincluded;
 
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -43,9 +42,4 @@ public class ONIUtils {
     public static Item.Properties defaultProperties() {
         return new Item.Properties();
     }
-
-    //damage source
-    public static final DamageSource oxygenDamage = new DamageSource("oniutils.oxygen").bypassArmor();
-    public static final DamageSource gas = new DamageSource("oniutils.gas").bypassArmor();
-    public static final DamageSource germDamage = new DamageSource("oniutils.germ").bypassArmor();
 }

@@ -1,5 +1,8 @@
 package com.github.wintersteve25.energynotincluded.common.data.capabilities.germ;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,6 +28,7 @@ import com.github.wintersteve25.energynotincluded.common.data.capabilities.germ.
 import com.github.wintersteve25.energynotincluded.common.registries.ONICapabilities;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIConfig;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.LangHelper;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -199,7 +203,7 @@ public class GermEventsHandler {
                             if (germAmount > 85000) {
                                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS));
                                 if (germAmount > 2000000) {
-                                    player.hurt(ONIUtils.germDamage, 6);
+                                    player.hurt(getGermDamageSource(player), 6);
                                 }
                             }
                         }
@@ -209,7 +213,7 @@ public class GermEventsHandler {
                             if (germAmount > 85000) {
                                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS));
                                 if (germAmount > 2000000) {
-                                    player.hurt(ONIUtils.germDamage, 6);
+                                    player.hurt(getGermDamageSource(player), 6);
                                 }
                             }
                         }
@@ -217,7 +221,7 @@ public class GermEventsHandler {
                         if (germTypes == EnumGermType.ZOMBIE_SPORES && germAmount > 100000) {
                             player.addEffect(new MobEffectInstance(MobEffects.POISON));
                             if (germAmount > 1500000) {
-                                player.hurt(ONIUtils.germDamage, 6);
+                                player.hurt(getGermDamageSource(player), 6);
                             }
                         }
 
@@ -228,6 +232,10 @@ public class GermEventsHandler {
                 });
             }
         }
+    }
+
+    private static DamageSource getGermDamageSource(Player player) {
+        return player.level().damageSources().source(ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(ONIUtils.MODID, "germ")));
     }
 
     private static boolean canTransferGerm(IGerms stack) {
