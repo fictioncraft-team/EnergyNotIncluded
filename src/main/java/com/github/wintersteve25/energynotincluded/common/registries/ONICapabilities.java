@@ -1,15 +1,12 @@
 package com.github.wintersteve25.energynotincluded.common.registries;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.data.capabilities.germ.api.IGerms;
 import com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api.IPlasma;
 import com.github.wintersteve25.energynotincluded.common.data.capabilities.player_data.api.IPlayerData;
 import com.github.wintersteve25.energynotincluded.common.data.capabilities.world_gas.api.IWorldGas;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 public class ONICapabilities {
     public static Capability<IGerms> GERMS;

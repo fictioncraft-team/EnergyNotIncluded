@@ -32,7 +32,7 @@ public class ONIEngLangProvider extends LanguageProvider {
         autoGenLang();
 
         //item groups
-        add("itemGroup.oniutils", "FC: ONIUtils");
+        add("itemGroup." + ONIUtils.MODID, "FC: ONIUtils");
 
         //messages
         add("oniutils.message.germs.infectEntity", "Infected interacted entity with %s %s");

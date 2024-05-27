@@ -52,19 +52,11 @@ public class ONIBlockDeferredRegister {
     }
 
     public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator) {
-        DeferredHolder<Block, B> blockHolder = blocks.register(name, blockSupplier);
-        DeferredHolder<Item, I> itemHolder = blockItems.register(name, () -> itemCreator.apply(blockSupplier.get()));
-        DeferredBlock<B, I> registeredBlock = new DeferredBlock<>(blockHolder, itemHolder);
-        allBlocks.put(registeredBlock, new ONIBlockRegistryData());
-        return registeredBlock;
+        return register(name, blockSupplier, itemCreator, false, true, true, true);
     }
 
     public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator, boolean doStateGen, boolean doModelGen, boolean doLangGen, boolean doLootableGen) {
-        DeferredHolder<Block, B> blockHolder = blocks.register(name, blockSupplier);
-        DeferredHolder<Item, I> itemHolder = blockItems.register(name, () -> itemCreator.apply(blockSupplier.get()));
-        DeferredBlock<B, I> registeredBlock = new DeferredBlock<>(blockHolder, itemHolder);
-        allBlocks.put(registeredBlock, new ONIBlockRegistryData(doStateGen, doModelGen, doLangGen, doLootableGen));
-        return registeredBlock;
+        return register(name, blockSupplier, itemCreator, new ONIBlockRegistryData(doStateGen, doModelGen, doLangGen, doLootableGen));
     }
 
     public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator, ONIBlockRegistryData registryData) {
