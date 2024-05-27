@@ -1,17 +1,17 @@
 package com.github.wintersteve25.energynotincluded.common.datagen;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.datagen.client.ONIEngLangProvider;
 import com.github.wintersteve25.energynotincluded.common.datagen.client.ONIModelProvider;
 import com.github.wintersteve25.energynotincluded.common.datagen.client.ONIStateProvider;
 import com.github.wintersteve25.energynotincluded.common.datagen.server.ONILootTableProvider;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-@Mod.EventBusSubscriber(modid = ONIUtils.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ONIUtils.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ONIDataGen {
 
     @SubscribeEvent
@@ -19,16 +19,12 @@ public class ONIDataGen {
         DataGenerator gen = event.getGenerator();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
-        if (event.includeServer()) {
-            gen.addProvider(new ONILootTableProvider(gen));
-        }
+        gen.addProvider(event.includeServer(), new ONILootTableProvider(gen));
 
-        if (event.includeClient()) {
-            gen.addProvider(new ONIStateProvider(gen, existingFileHelper));
-            gen.addProvider(new ONIModelProvider(gen, existingFileHelper));
+        gen.addProvider(event.includeClient(), new ONIStateProvider(gen.getPackOutput(), existingFileHelper));
+        gen.addProvider(event.includeClient(), new ONIModelProvider(gen.getPackOutput(), existingFileHelper));
 
-            //en_US
-            gen.addProvider(new ONIEngLangProvider(gen));
-        }
+        //en_US
+        gen.addProvider(event.includeClient(), new ONIEngLangProvider(gen.getPackOutput()));
     }
 }

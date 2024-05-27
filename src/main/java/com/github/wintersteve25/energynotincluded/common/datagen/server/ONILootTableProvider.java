@@ -1,7 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.datagen.server;
 
-import mekanism.common.registration.impl.BlockRegistryObject;
-import net.minecraft.world.item.BlockItem;
+import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.data.DataGenerator;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
@@ -18,9 +17,12 @@ public class ONILootTableProvider extends LootTableBase {
     }
 
     private void standardTables() {
-        for (BlockRegistryObject<? extends Block, ? extends BlockItem> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
+        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
             ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
-            if (data.isDoLootTableGen()) lootTables.putIfAbsent(b.getBlock(), createStandardTable(b.getName(), b.getBlock()));
+            if (data.isDoLootTableGen()) {
+                Block block = b.block().get();
+                lootTables.putIfAbsent(block, createStandardTable(b.block().getId().getPath(), block));
+            }
         }
     }
 }

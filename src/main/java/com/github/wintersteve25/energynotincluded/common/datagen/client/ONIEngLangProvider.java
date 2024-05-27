@@ -1,14 +1,14 @@
 package com.github.wintersteve25.energynotincluded.common.datagen.client;
 
-import mekanism.common.registration.impl.BlockRegistryObject;
-import mekanism.common.registration.impl.ItemRegistryObject;
+import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.apache.commons.lang3.text.WordUtils;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.client.gui.ONIBaseGuiTab;
@@ -23,7 +23,7 @@ import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIItems;
 
 public class ONIEngLangProvider extends LanguageProvider {
-    public ONIEngLangProvider(DataGenerator gen) {
+    public ONIEngLangProvider(PackOutput gen) {
         super(gen, ONIUtils.MODID, "en_us");
     }
 
@@ -105,32 +105,39 @@ public class ONIEngLangProvider extends LanguageProvider {
 
         // keybinds
         add("oniutils.keybinds.category", "FC: ONIUtils Keybinds");
-
-        // curios
-        if (ModList.get().isLoaded("curios")) {
-            CuriosCompat.lang(this);
-        }
     }
 
     private void autoGenLang() {
-        for (BlockRegistryObject<? extends Block, ? extends BlockItem> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
+        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
             ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
-            if (data.isDoLangGen()) add("block.oniutils." + b.getName(), WordUtils.capitalizeFully(b.getName().replace("_", " ")));
+            if (data.isDoLangGen()) {
+                String name = b.block().getId().getPath();
+                add("block.oniutils." + name, WordUtils.capitalizeFully(name.replace("_", " ")));
+            }
         }
-        for (ItemRegistryObject<? extends Item> i : ONIItems.ITEMS.getAllItems().keySet()) {
+
+        for (DeferredHolder<Item, ?> i : ONIItems.ITEMS.getAllItems().keySet()) {
             ONIItemRegistryData data = ONIItems.ITEMS.getAllItems().get(i);
-            if (data.isDoLangGen()) add("item.oniutils." + i.getName(), WordUtils.capitalizeFully(i.getName().replace("_", " ")));
+
+            if (data.isDoLangGen()) {
+                String name = i.getId().getPath();
+                add("item.oniutils." + name, WordUtils.capitalizeFully(name.replace("_", " ")));
+            }
         }
+
         for (Element element : Element.values()) {
             add("gas.oniutils." + element.getName(), element.getLang() + " Gas");
         }
+
         for (EnumGermType germType : EnumGermType.values()) {
             add("germ.oniutils." + germType.getName(), WordUtils.capitalizeFully(germType.getName().replace("_", " ")));
         }
+
         for (SkillType skillType : SkillType.values()) {
             String n = skillType.name().toLowerCase();
             add("skill.oniutils." + n, WordUtils.capitalizeFully(n.replace("_", " ")));
         }
+
         for (TraitType traitType : TraitType.values()) {
             String n = traitType.name().toLowerCase();
             add("trait.oniutils." + n, WordUtils.capitalizeFully(n.replace("_", " ")));

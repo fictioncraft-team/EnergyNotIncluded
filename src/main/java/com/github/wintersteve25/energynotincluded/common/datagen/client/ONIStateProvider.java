@@ -1,13 +1,11 @@
 package com.github.wintersteve25.energynotincluded.common.datagen.client;
 
-import mekanism.common.registration.impl.BlockRegistryObject;
+import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseDirectional;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
@@ -16,10 +14,13 @@ import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.ModelFileHelper;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.ResoureceLocationHelper;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 public class ONIStateProvider extends BlockStateProvider {
 
-    public ONIStateProvider(DataGenerator gen, ExistingFileHelper exFileHelper) {
+    public ONIStateProvider(PackOutput gen, ExistingFileHelper exFileHelper) {
         super(gen, ONIUtils.MODID, exFileHelper);
     }
 
@@ -29,13 +30,13 @@ public class ONIStateProvider extends BlockStateProvider {
     }
 
     private void autoGenStatesAndModels() {
-        for (BlockRegistryObject<? extends Block, ? extends BlockItem> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
+        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
             ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
             if (data.isDoStateGen()) {
-                if (b.getBlock() instanceof ONIBaseDirectional directional && data instanceof ONIDirectionalBlockRegistryData directionalData) {
+                if (b.block().get() instanceof ONIBaseDirectional directional && data instanceof ONIDirectionalBlockRegistryData directionalData) {
                     directionalBlock(directional, directionalData.getModelFile(), directionalData.getAngleOffset());
                 } else {
-                    simpleBlock(b.getBlock());
+                    simpleBlock(b.block().get());
                 }
             }
         }
@@ -57,94 +58,31 @@ public class ONIStateProvider extends BlockStateProvider {
         weightedRock(ONIBlocks.NonFunctionals.WOLFRAMITE, 8);
     }
 
-    private void weightedRock(BlockRegistryObject<? extends Block, BlockItem> block, int amoutOfAlts) {
-        String name = MiscHelper.langToReg(block.getName());
-        weightedState(block.getBlock(), name, new ResourceLocation(ONIUtils.MODID, "block/rocks/" + name), amoutOfAlts);
+    private void weightedRock(ONIBlockDeferredRegister.DeferredBlock<?, ?> block, int amoutOfAlts) {
+        String name = MiscHelper.langToReg(block.block().getId().getPath());
+        weightedState(block.block().get(), name, new ResourceLocation(ONIUtils.MODID, "block/rocks/" + name), amoutOfAlts);
     }
 
     private void weightedState(Block block, String modelBaseName, ResourceLocation textureBaseLocation, int amountOfAlts) {
         getVariantBuilder(block)
                 .forAllStates(state -> {
-                    switch (amountOfAlts) {
-                        case 1:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 2:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 3:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 4:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt4", ResoureceLocationHelper.extend(textureBaseLocation, "_alt4"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 5:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt4", ResoureceLocationHelper.extend(textureBaseLocation, "_alt4"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt5", ResoureceLocationHelper.extend(textureBaseLocation, "_alt5"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 6:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt4", ResoureceLocationHelper.extend(textureBaseLocation, "_alt4"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt5", ResoureceLocationHelper.extend(textureBaseLocation, "_alt5"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt6", ResoureceLocationHelper.extend(textureBaseLocation, "_alt6"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 7:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt4", ResoureceLocationHelper.extend(textureBaseLocation, "_alt4"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt5", ResoureceLocationHelper.extend(textureBaseLocation, "_alt5"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt6", ResoureceLocationHelper.extend(textureBaseLocation, "_alt6"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt7", ResoureceLocationHelper.extend(textureBaseLocation, "_alt7"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 8:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt4", ResoureceLocationHelper.extend(textureBaseLocation, "_alt4"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt5", ResoureceLocationHelper.extend(textureBaseLocation, "_alt5"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt6", ResoureceLocationHelper.extend(textureBaseLocation, "_alt6"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt7", ResoureceLocationHelper.extend(textureBaseLocation, "_alt7"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt8", ResoureceLocationHelper.extend(textureBaseLocation, "_alt8"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 9:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt4", ResoureceLocationHelper.extend(textureBaseLocation, "_alt4"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt5", ResoureceLocationHelper.extend(textureBaseLocation, "_alt5"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt6", ResoureceLocationHelper.extend(textureBaseLocation, "_alt6"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt7", ResoureceLocationHelper.extend(textureBaseLocation, "_alt7"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt8", ResoureceLocationHelper.extend(textureBaseLocation, "_alt8"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt9", ResoureceLocationHelper.extend(textureBaseLocation, "_alt9"), models())).weight((int) 100 / amountOfAlts).build();
-                        case 10:
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt", ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt2", ResoureceLocationHelper.extend(textureBaseLocation, "_alt2"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt3", ResoureceLocationHelper.extend(textureBaseLocation, "_alt3"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt4", ResoureceLocationHelper.extend(textureBaseLocation, "_alt4"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt5", ResoureceLocationHelper.extend(textureBaseLocation, "_alt5"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt6", ResoureceLocationHelper.extend(textureBaseLocation, "_alt6"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt7", ResoureceLocationHelper.extend(textureBaseLocation, "_alt7"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt8", ResoureceLocationHelper.extend(textureBaseLocation, "_alt8"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt9", ResoureceLocationHelper.extend(textureBaseLocation, "_alt9"), models())).weight((int) 100 / amountOfAlts).nextModel()
-                                    .modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt9", ResoureceLocationHelper.extend(textureBaseLocation, "_alt10"), models())).weight((int) 100 / amountOfAlts).build();
-                        default:
-                            ONIUtils.LOGGER.warn("Tried to create weighted state out of supported range");
-                            return ConfiguredModel.builder().modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models())).weight((int) 100 / amountOfAlts).build();
+                    int weight = 100 / amountOfAlts;
+
+                    ConfiguredModel.Builder<?> builder = ConfiguredModel.builder()
+                            .modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models()))
+                            .weight(weight)
+                            .nextModel();
+
+                    for (int i = 1; i <= amountOfAlts; i++) {
+                        builder.modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt" + i, ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models()))
+                                .weight(weight);
+
+                        if (i < amountOfAlts) {
+                            builder.nextModel();
+                        }
                     }
+
+                    return builder.build();
                 });
     }
 }

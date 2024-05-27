@@ -1,15 +1,8 @@
 package com.github.wintersteve25.energynotincluded.common.datagen.client;
 
-import mekanism.common.registration.impl.BlockRegistryObject;
-import mekanism.common.registration.impl.ItemRegistryObject;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.data.DataGenerator;
+import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIIItem;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.cables.PowerCableBlock;
@@ -19,9 +12,14 @@ import com.github.wintersteve25.energynotincluded.common.registration.item.ONIIt
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIItems;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ONIModificationItem;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class ONIModelProvider extends ItemModelProvider {
-    public ONIModelProvider(DataGenerator generator, ExistingFileHelper existingFileHelper) {
+    public ONIModelProvider(PackOutput generator, ExistingFileHelper existingFileHelper) {
         super(generator, ONIUtils.MODID, existingFileHelper);
     }
 
@@ -39,29 +37,32 @@ public class ONIModelProvider extends ItemModelProvider {
     }
 
     private void autoGenModels() {
-        for (BlockRegistryObject<? extends Block, ? extends BlockItem> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
+        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
             ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
             if (data.isDoModelGen()) {
+                String name = b.block().getId().getPath();
+
                 if (data instanceof ONIDirectionalBlockRegistryData directionalData) {
-                    withExistingParent(b.getName(), directionalData.getModelFile().getLocation());
-                } else if (b.getBlock() instanceof PowerCableBlock) {
-                    withExistingParent(b.getName(), modLoc("block/wires/" + b.getName() + "/main"));
+                    withExistingParent(name, directionalData.getModelFile().getLocation());
+                } else if (b.block().get() instanceof PowerCableBlock) {
+                    withExistingParent(name, modLoc("block/wires/" + name + "/main"));
                 } else {
-                    withExistingParent(b.getName(), modLoc("block/" + b.getName()));
+                    withExistingParent(name, modLoc("block/" + name));
                 }
             }
         }
 
-        for (ItemRegistryObject<? extends Item> i : ONIItems.ITEMS.getAllItems().keySet()) {
+        for (DeferredHolder<Item, ? extends Item> i : ONIItems.ITEMS.getAllItems().keySet()) {
             ONIItemRegistryData data = ONIItems.ITEMS.getAllItems().get(i);
             if (data.isDoModelGen()) {
                 Item item = i.get();
                 if (item instanceof ONIModificationItem mod) {
-                    String name = i.getName();
+                    String name = i.getId().getPath();
                     String processedName = mod.getModType().getName() + name.charAt(name.length() - 1);
                     builder(name, "modifications/" + processedName);
                 } else {
-                    String name = i.getName();
+                    String name = i.getId().getPath();
+
                     if (item instanceof ONIIItem) {
                         builder(name, ((ONIIItem) item).getONIItemCategory().getPathName() + name);
                     } else {
