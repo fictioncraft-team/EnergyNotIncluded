@@ -45,7 +45,7 @@ public class ONIUtils {
     public ONIUtils(final IEventBus modEventBus) {
         final IEventBus forgeEventBus = NeoForge.EVENT_BUS;
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ONIConfig.Server.SERVER_CONFIG);
+        ModLoadingContext.get().getActiveContainer().registerConfig(ModConfig.Type.SERVER, ONIConfig.Server.SERVER_CONFIG);
         Registration.init(modEventBus);
         TAB_REGISTER.register(modEventBus);
 
