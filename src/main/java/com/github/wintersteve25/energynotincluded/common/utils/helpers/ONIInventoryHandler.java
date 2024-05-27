@@ -1,9 +1,9 @@
 package com.github.wintersteve25.energynotincluded.common.utils.helpers;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseInvTE;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.ONIIHasValidItems;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import java.util.function.BiPredicate;

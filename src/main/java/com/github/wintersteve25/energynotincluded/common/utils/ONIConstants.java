@@ -1,19 +1,15 @@
 package com.github.wintersteve25.energynotincluded.common.utils;
 
-import mekanism.common.util.WorldUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
-import software.bernie.geckolib3.renderers.geo.GeoItemRenderer;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base.GeckolibModelBase;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseAnimatedBlockItem;
@@ -79,8 +75,8 @@ public final class ONIConstants {
     }
 
     public static final class LangKeys {
-        public static final TranslatableComponent MOD_TOOLTIP = new TranslatableComponent("oniutils.tooltips.items.modification");
-        public static final TranslatableComponent HOLD_SHIFT = new TranslatableComponent("oniutils.tooltips.items.holdShiftInfo");
+        public static final Component MOD_TOOLTIP = Component.translatable("oniutils.tooltips.items.modification");
+        public static final Component HOLD_SHIFT = Component.translatable("oniutils.tooltips.items.holdShiftInfo");
 
         public static final String SEDIMENTARY_ROCK = "sedimentary_rock";
         public static final String COAL_GEN = "coal_generator";

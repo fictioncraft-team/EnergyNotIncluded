@@ -3,13 +3,13 @@ package com.github.wintersteve25.energynotincluded.common.utils.helpers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
 import com.github.wintersteve25.energynotincluded.client.gui.ONIBaseGuiTabModification;
 import com.github.wintersteve25.energynotincluded.common.contents.base.enums.EnumModifications;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ModificationContext;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ONIModificationItem;
 import com.github.wintersteve25.energynotincluded.common.network.ONINetworking;
 import com.github.wintersteve25.energynotincluded.common.network.PacketRenderError;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;

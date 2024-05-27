@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.INBTSerializable;
 
 public class DupleRequests implements INBTSerializable<CompoundTag> {
     public SerializableMap<BlockPos, BlockState> buildRequests;

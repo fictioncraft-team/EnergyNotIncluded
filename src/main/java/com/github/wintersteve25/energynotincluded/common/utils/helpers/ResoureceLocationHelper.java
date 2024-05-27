@@ -1,7 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.utils.helpers;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
@@ -177,16 +176,16 @@ public class ResoureceLocationHelper {
 
         public Component buildItemGroupTextComponent() {
             String fixedString = "itemGroup." + modID;
-            return new TranslatableComponent(fixedString, args);
+            return Component.translatable(fixedString, args);
         }
 
         public Component buildTranslationTextComponent() {
             String fixedString = modID + "." + pathIn.replace('/', '.');
             if (fixedString.charAt(fixedString.length() - 1) == '.') {
                 String fixed = fixedString.substring(0, fixedString.length() - 1);
-                return new TranslatableComponent(fixed, args);
+                return Component.translatable(fixed, args);
             }
-            return new TranslatableComponent(fixedString, args);
+            return Component.translatable(fixedString, args);
         }
 
         public boolean isPathEmpty() {

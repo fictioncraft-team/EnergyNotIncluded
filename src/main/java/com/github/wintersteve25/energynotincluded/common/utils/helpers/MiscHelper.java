@@ -1,10 +1,7 @@
 package com.github.wintersteve25.energynotincluded.common.utils.helpers;
 
-import mekanism.common.util.WorldUtils;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.Item;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIBoundingBlock;
@@ -17,9 +14,7 @@ import java.util.stream.Collectors;
 
 public class MiscHelper {
 
-    public static final int INT_MAX = Integer.MAX_VALUE;
     public static final double ONEPIXEL = 1D / 16;
-    public static final Item.Properties DEFAULT_ITEM_PROPERTY = ONIUtils.defaultProperties();
 
     public static String langToReg(String lang) {
         return lang.toLowerCase().replace(' ', '_').replace('-', '_');
@@ -42,16 +37,15 @@ public class MiscHelper {
      */
     public static void makeBoundingBlock(@Nullable LevelAccessor world, BlockPos boundingLocation, BlockPos orig) {
         if (world != null) {
-            ONIBoundingBlock boundingBlock = ONIBlocks.Misc.BOUNDING_BLOCK.getBlock();
+            ONIBoundingBlock boundingBlock = ONIBlocks.Misc.BOUNDING_BLOCK.block().get();
             BlockState newState = boundingBlock.defaultBlockState();
             world.setBlock(boundingLocation, newState, 3);
-            if (!world.isClientSide()) {
-                ONIBoundingTE tile = (ONIBoundingTE) WorldUtils.getTileEntity((Class) ONIBoundingTE.class, (BlockGetter) world, boundingLocation);
-                if (tile != null) {
-                    tile.setMainLocation(orig);
-                } else {
-                    ONIUtils.LOGGER.warn("Unable to find Bounding Block Tile at: {}", boundingLocation);
-                }
+
+            if (world.isClientSide()) return;
+            if (world.getBlockEntity(boundingLocation) instanceof ONIBoundingTE tile) {
+                tile.setMainLocation(orig);
+            } else {
+                ONIUtils.LOGGER.warn("Unable to find Bounding Block Tile at: {}", boundingLocation);
             }
         }
     }

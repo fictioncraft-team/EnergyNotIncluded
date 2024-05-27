@@ -5,8 +5,8 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandler;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseInvTE;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class ISHandlerHelper {
     public static void dropInventory(ONIBaseInvTE invTE, Level world, BlockState state, BlockPos pos, int inventorySize) {

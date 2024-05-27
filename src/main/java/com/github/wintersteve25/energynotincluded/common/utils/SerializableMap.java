@@ -2,12 +2,14 @@ package com.github.wintersteve25.energynotincluded.common.utils;
 
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.data.saved_data.requests.ServerDupeRequests;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.*;
 import java.util.function.Function;
@@ -42,7 +44,7 @@ public class SerializableMap<K, V> implements INBTSerializable<CompoundTag>, Map
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
         ListTag keys = new ListTag();
         ListTag values = new ListTag();
         var compound = new CompoundTag();
@@ -59,7 +61,7 @@ public class SerializableMap<K, V> implements INBTSerializable<CompoundTag>, Map
     }
 
     @Override
-    public void deserializeNBT(CompoundTag nbt) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         ListTag keys = nbt.getList("keys", keyDataType);
         ListTag values = nbt.getList("values", valueDataType);
 
