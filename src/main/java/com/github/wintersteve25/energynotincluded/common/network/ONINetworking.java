@@ -1,88 +1,64 @@
 package com.github.wintersteve25.energynotincluded.common.network;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
-import com.github.wintersteve25.energynotincluded.ONIUtils;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class ONINetworking {
-    private static final SimpleChannel INSTANCE;
-    private static int ID = 0;
+    public static void registerMessages(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("1");
 
-    private static int nextID() {
-        return ID++;
+        registrar.playBidirectional(
+                PacketModification.TYPE,
+                PacketModification.STREAM_CODEC,
+                new DirectionalPayloadHandler<>(
+                        PacketModification::handleOnClient,
+                        PacketModification::handleOnServer
+                )
+        );
+
+        registrar.playToClient(
+                PacketOpenUI.TYPE,
+                PacketOpenUI.CODEC,
+                PacketOpenUI::handle
+        );
+
+        registrar.playToClient(
+                PacketRenderError.TYPE,
+                PacketRenderError.CODEC,
+                PacketRenderError::handle
+        );
+
+        registrar.playToServer(
+                PacketSetBlueprintRecipe.TYPE,
+                PacketSetBlueprintRecipe.CODEC,
+                PacketSetBlueprintRecipe::handle
+        );
+
+        registrar.playToClient(
+                PacketUpdateClientBE.TYPE,
+                PacketUpdateClientBE.CODEC,
+                PacketUpdateClientBE::handle
+        );
+
+        registrar.playToServer(
+                PacketUpdateServerBE.TYPE,
+                PacketUpdateServerBE.CODEC,
+                PacketUpdateServerBE::handle
+        );
     }
 
-    static {
-        INSTANCE = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(ONIUtils.MODID, "oniutils"))
-                .networkProtocolVersion(() -> "1.0")
-                .clientAcceptedVersions(version -> true)
-                .serverAcceptedVersions(version -> true)
-                .simpleChannel();
+    public static void sendToClient(CustomPacketPayload packet, ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, packet);
     }
 
-    public static void registerMessages() {
-        INSTANCE.messageBuilder(PacketUpdateServerBE.class, nextID())
-                .encoder(PacketUpdateServerBE::encode)
-                .decoder(PacketUpdateServerBE::new)
-                .consumer(PacketUpdateServerBE::handle)
-                .add();
-
-        INSTANCE.messageBuilder(PacketUpdateClientBE.class, nextID())
-                .encoder(PacketUpdateClientBE::encode)
-                .decoder(PacketUpdateClientBE::new)
-                .consumer(PacketUpdateClientBE::handle)
-                .add();
-
-        INSTANCE.messageBuilder(PacketModification.class, nextID())
-                .encoder(PacketModification::encode)
-                .decoder(PacketModification::new)
-                .consumer(PacketModification::handle)
-                .add();
-
-        INSTANCE.messageBuilder(PacketRenderError.class, nextID())
-                .encoder((var1, var2) -> {})
-                .decoder((buffer) -> new PacketRenderError())
-                .consumer(PacketRenderError::handle)
-                .add();
-
-        INSTANCE.messageBuilder(PacketTriggerPlayerMove.class, nextID())
-                .encoder(PacketTriggerPlayerMove::encode)
-                .decoder(PacketTriggerPlayerMove::new)
-                .consumer(PacketTriggerPlayerMove::handle)
-                .add();
-
-        INSTANCE.messageBuilder(PacketUpdateClientWorldBuildRequest.class, nextID())
-                .encoder(PacketUpdateClientWorldBuildRequest::encode)
-                .decoder(PacketUpdateClientWorldBuildRequest::new)
-                .consumer(PacketUpdateClientWorldBuildRequest::handle)
-                .add();
-
-        INSTANCE.messageBuilder(PacketOpenBlueprintUI.class, nextID())
-                .encoder((var1, var2) -> {})
-                .decoder((buffer) -> new PacketOpenBlueprintUI())
-                .consumer(PacketOpenBlueprintUI::handle)
-                .add();
-
-        INSTANCE.messageBuilder(PacketSetBlueprintRecipe.class, nextID())
-                .encoder(PacketSetBlueprintRecipe::encode)
-                .decoder(PacketSetBlueprintRecipe::new)
-                .consumer(PacketSetBlueprintRecipe::handle)
-                .add();
-    }
-
-    public static SimpleChannel getInstance() {
-        return INSTANCE;
-    }
-
-    public static void sendToClient(Object packet, ServerPlayer player) {
-        INSTANCE.sendTo(packet, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-    }
-
-    public static void sendToServer(Object packet) {
-        INSTANCE.sendToServer(packet);
+    public static void sendToServer(CustomPacketPayload packet) {
+        PacketDistributor.sendToServer(packet);
     }
 }

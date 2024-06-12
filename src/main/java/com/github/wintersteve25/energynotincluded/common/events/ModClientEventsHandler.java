@@ -3,14 +3,6 @@ package com.github.wintersteve25.energynotincluded.common.events;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.placeholder.ONIPlaceHolderBER;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.client.keybinds.ONIKeybinds;
 import com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base.GeckolibBlockRendererBase;
@@ -19,17 +11,24 @@ import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks
 import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal.CoalGenTE;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.utils.ONIConstants;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
-@Mod.EventBusSubscriber(modid = ONIUtils.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ONIUtils.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ModClientEventsHandler {
 
     @SubscribeEvent
-    public static void clientPreInit(FMLClientSetupEvent event) {
+    public static void clientPreInit(final FMLClientSetupEvent event) {
         //Keybindings
         ONIKeybinds.init();
 
         //Events
-        MinecraftForge.EVENT_BUS.addListener(GermEventsHandler::itemToolTipEvent);
+        NeoForge.EVENT_BUS.addListener(GermEventsHandler::itemToolTipEvent);
 
         //GUI Attachments
         MenuScreens.register(ONIBlocks.Machines.Power.COAL_GEN_CONTAINER.get(), CoalGenGui::new);

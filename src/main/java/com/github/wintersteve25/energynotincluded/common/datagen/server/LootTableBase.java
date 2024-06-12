@@ -71,7 +71,7 @@ public abstract class LootTableBase extends LootTableProvider {
             try {
                 DataProvider.save(GSON, cache, LootTables.serialize(lootTable), path);
             } catch (IOException e) {
-                LOGGER.error("Couldn't write loot table {}", path, e);
+                LOGGER.error("Couldn'packetModType write loot table {}", path, e);
             }
         });
     }

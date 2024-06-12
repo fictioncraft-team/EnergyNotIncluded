@@ -1,39 +1,38 @@
 package com.github.wintersteve25.energynotincluded.common.events;
 
 import net.minecraft.client.player.Input;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.MovementInputUpdateEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.network.ONINetworking;
-import com.github.wintersteve25.energynotincluded.common.network.PacketTriggerPlayerMove;
 import com.github.wintersteve25.energynotincluded.common.events.events.PlayerMovingEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 
-@Mod.EventBusSubscriber(modid = ONIUtils.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ONIUtils.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
 public class ForgeClientEventsHandler {
     @SubscribeEvent
     public static void userInput(MovementInputUpdateEvent event) {
-        PlayerMovingEvent.MovementTypes type = null;
+        PlayerMovingEvent.MovementType type = null;
 
         Input input = event.getInput();
 
         if (input.down) {
-            type = PlayerMovingEvent.MovementTypes.S;
+            type = PlayerMovingEvent.MovementType.S;
         } else if (input.up) {
-            type = PlayerMovingEvent.MovementTypes.W;
+            type = PlayerMovingEvent.MovementType.W;
         } else if (input.jumping) {
-            type = PlayerMovingEvent.MovementTypes.JUMP;
+            type = PlayerMovingEvent.MovementType.JUMP;
         } else if (input.left) {
-            type = PlayerMovingEvent.MovementTypes.A;
+            type = PlayerMovingEvent.MovementType.A;
         } else if (input.right) {
-            type = PlayerMovingEvent.MovementTypes.D;
+            type = PlayerMovingEvent.MovementType.D;
         } else if (input.shiftKeyDown) {
-            type = PlayerMovingEvent.MovementTypes.SNEAK;
+            type = PlayerMovingEvent.MovementType.SNEAK;
         }
 
         if (type == null) return;
 
-        ONINetworking.sendToServer(new PacketTriggerPlayerMove(event.getPlayer().getUUID(), type));
+        ONINetworking.sendToServer(new PacketTriggerPlayerMove(event.getEntity().getUUID(), type));
     }
 }

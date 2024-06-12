@@ -1,79 +1,77 @@
 package com.github.wintersteve25.energynotincluded.common.network;
 
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.network.NetworkEvent;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseTE;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.ONIIForceStoppable;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.ONIIHasRedstoneOutput;
 import com.github.wintersteve25.energynotincluded.common.utils.ONIConstants;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public record PacketUpdateServerBE(BlockPos pos, byte packetType, int thresholdValue) implements CustomPacketPayload {
 
-public class PacketUpdateServerBE {
-
-    private final BlockPos pos;
-    private final byte packetType;
-    private final int thresholdValue;
+    public static final CustomPacketPayload.Type<PacketUpdateServerBE> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(ONIUtils.MODID, "updateServerBE"));
+    public static final StreamCodec<ByteBuf, PacketUpdateServerBE> CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            PacketUpdateServerBE::pos,
+            ByteBufCodecs.BYTE,
+            PacketUpdateServerBE::packetType,
+            ByteBufCodecs.INT,
+            PacketUpdateServerBE::thresholdValue,
+            PacketUpdateServerBE::new
+    );
 
     public PacketUpdateServerBE(BlockEntity teIn, byte packetType) {
-        this.pos = teIn.getBlockPos();
-        this.packetType = packetType;
-        this.thresholdValue = 0;
+        this(teIn.getBlockPos(), packetType, 0);
     }
 
-    public PacketUpdateServerBE(BlockEntity teIn, byte packetType, int thresholdValueIn) {
-        this.pos = teIn.getBlockPos();
-        this.packetType = packetType;
-        this.thresholdValue = thresholdValueIn;
-    }
+    public static void handle(PacketUpdateServerBE data, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
+            if (data.pos == null) {
+                return;
+            }
 
-    public PacketUpdateServerBE(FriendlyByteBuf buffer) {
-        this.pos = buffer.readBlockPos();
-        this.packetType = buffer.readByte();
-        this.thresholdValue = buffer.readInt();
-    }
+            ServerPlayer player = (ServerPlayer) ctx.player();
+            ONIBaseTE te = (ONIBaseTE) player.getCommandSenderWorld().getBlockEntity(data.pos);
 
-    public void encode(FriendlyByteBuf buffer) {
-        buffer.writeBlockPos(pos);
-        buffer.writeByte(packetType);
-        buffer.writeInt(thresholdValue);
-    }
+            if (te == null) {
+                return;
+            }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            if (pos != null) {
-                ServerPlayer player = ctx.get().getSender();
-                ONIBaseTE te = (ONIBaseTE) player.getCommandSenderWorld().getBlockEntity(pos);
-                if (te != null) {
-                    switch (packetType) {
-                        case ONIConstants.PacketType.REDSTONE_INPUT:
-                            if (te instanceof ONIIForceStoppable forceStoppable) {
-                                forceStoppable.toggleInverted();
-                            }
-                            break;
-                        case ONIConstants.PacketType.REDSTONE_OUTPUT_LOW:
-                            if (te instanceof ONIIHasRedstoneOutput tile) {
-                                tile.setLowThreshold(thresholdValue);
-                            } else {
-                                ONIUtils.LOGGER.warn("Sent redstone output packet but tile does not support redstone output, Pos: {}", pos);
-                            }
-                            break;
-                        case ONIConstants.PacketType.REDSTONE_OUTPUT_HIGH:
-                            if (te instanceof ONIIHasRedstoneOutput tile) {
-                                tile.setHighThreshold(thresholdValue);
-                            } else {
-                                ONIUtils.LOGGER.warn("Sent redstone output packet but tile does not support redstone output, Pos: {}", pos);
-                            }
-                            break;
+
+            switch (data.packetType) {
+                case ONIConstants.PacketType.REDSTONE_INPUT:
+                    if (te instanceof ONIIForceStoppable forceStoppable) {
+                        forceStoppable.toggleInverted();
                     }
-                }
+                    break;
+                case ONIConstants.PacketType.REDSTONE_OUTPUT_LOW:
+                    if (te instanceof ONIIHasRedstoneOutput tile) {
+                        tile.setLowThreshold(data.thresholdValue);
+                    } else {
+                        ONIUtils.LOGGER.warn("Sent redstone output packet but tile does not support redstone output, Pos: {}", data.pos);
+                    }
+                    break;
+                case ONIConstants.PacketType.REDSTONE_OUTPUT_HIGH:
+                    if (te instanceof ONIIHasRedstoneOutput tile) {
+                        tile.setHighThreshold(data.thresholdValue);
+                    } else {
+                        ONIUtils.LOGGER.warn("Sent redstone output packet but tile does not support redstone output, Pos: {}", data.pos);
+                    }
+                    break;
             }
         });
+    }
 
-        ctx.get().setPacketHandled(true);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

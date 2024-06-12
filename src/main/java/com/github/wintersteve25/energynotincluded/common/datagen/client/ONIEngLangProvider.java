@@ -48,7 +48,7 @@ public class ONIEngLangProvider extends LanguageProvider {
 
         add("death.attack.oniutils.oxygen", "%1$s forgot to breathe");
         add("death.attack.oniutils.gas", "%1$s forgot to wear a \"mask\"");
-        add("death.attack.oniutils.germ", "%1$s didn't take the vaccine");
+        add("death.attack.oniutils.germ", "%1$s didn'packetModType take the vaccine");
 
         add("oniutils.commands.germs.set.success", "Germ Amount Set to: %s %s");
         add("oniutils.commands.germs.get.success", "Current Germ Amount is: %s %s");
@@ -83,12 +83,12 @@ public class ONIEngLangProvider extends LanguageProvider {
         add("oniutils.gui.titles.coal_generator", ChatFormatting.WHITE + "Coal Generator");
 
         add("oniutils.gui.info.energy", "Plasma Stored: %s");
-        add("oniutils.gui.info.producingEnergy", "+%s Plasma/t");
-        add("oniutils.gui.info.consumingEnergy", "-%s Plasma/t");
-        add("oniutils.gui.info.producingGas", "+%s/t");
-        add("oniutils.gui.info.consumingGas", "-%s/t");
-        add("oniutils.gui.info.producingLiquid", "+%s/t");
-        add("oniutils.gui.info.consumingLiquid", "-%s/t");
+        add("oniutils.gui.info.producingEnergy", "+%s Plasma/packetModType");
+        add("oniutils.gui.info.consumingEnergy", "-%s Plasma/packetModType");
+        add("oniutils.gui.info.producingGas", "+%s/packetModType");
+        add("oniutils.gui.info.consumingGas", "-%s/packetModType");
+        add("oniutils.gui.info.producingLiquid", "+%s/packetModType");
+        add("oniutils.gui.info.consumingLiquid", "-%s/packetModType");
         add("oniutils.gui.info.progress", "Progress: %s");
 
         add("oniutils.gui.warning.durability", "Low Machine Durability!");

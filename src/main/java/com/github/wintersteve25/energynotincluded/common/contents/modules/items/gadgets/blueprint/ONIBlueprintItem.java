@@ -5,8 +5,9 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.pl
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseItem;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.recipes.blueprints.BlueprintRecipe;
 import com.github.wintersteve25.energynotincluded.common.network.ONINetworking;
-import com.github.wintersteve25.energynotincluded.common.network.PacketOpenBlueprintUI;
+import com.github.wintersteve25.energynotincluded.common.network.PacketOpenUI;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
+import com.github.wintersteve25.energynotincluded.common.registries.ONIGui;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -66,7 +67,7 @@ public class ONIBlueprintItem extends ONIBaseItem {
         }
 
         if (pPlayer.isCrouching() && pPlayer.pick(5, 0, false).getType() == HitResult.Type.MISS) {
-            ONINetworking.sendToClient(new PacketOpenBlueprintUI(), (ServerPlayer) pPlayer);
+            ONINetworking.sendToClient(new PacketOpenUI(ONIGui.BLUEPRINT), (ServerPlayer) pPlayer);
             return InteractionResultHolder.success(itemstack);
         }
 

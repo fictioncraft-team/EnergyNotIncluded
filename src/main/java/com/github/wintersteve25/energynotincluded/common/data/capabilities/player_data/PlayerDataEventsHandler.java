@@ -69,7 +69,7 @@ public class PlayerDataEventsHandler {
         Level world = player.getCommandSenderWorld();
         BlockPos pos = player.blockPosition();
         if (!world.isClientSide()) {
-            if (event.getMovement() == PlayerMovingEvent.MovementTypes.JUMP && event.getMovement() == PlayerMovingEvent.MovementTypes.SNEAK)
+            if (event.getMovement() == PlayerMovingEvent.MovementType.JUMP && event.getMovement() == PlayerMovingEvent.MovementType.SNEAK)
                 return;
             player.getCapability(ONICapabilities.PLAYER).ifPresent((cap) -> {
                 //Reset and redo calculation when moved

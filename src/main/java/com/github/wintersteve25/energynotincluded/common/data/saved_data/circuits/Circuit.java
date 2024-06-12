@@ -82,7 +82,7 @@ public class Circuit {
         }
 
         if (other == null) {
-            ONIUtils.LOGGER.error("Failed to merge circuit with ID: {} as second circuit doesn't exist", id);
+            ONIUtils.LOGGER.error("Failed to merge circuit with ID: {} as second circuit doesn'packetModType exist", id);
             return null;
         }
 

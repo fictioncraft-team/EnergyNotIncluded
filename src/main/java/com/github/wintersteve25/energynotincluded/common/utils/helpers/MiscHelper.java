@@ -65,7 +65,7 @@ public class MiscHelper {
     }
 
     /**
-     * @return returns a new list that contains all the object in the first list that isn't in the second list
+     * @return returns a new list that contains all the object in the first list that isn'packetModType in the second list
      */
     public static <E> List<E> filterList(Collection<E> list, Collection<E> other) {
         return list.stream().filter(obj -> !other.contains(obj)).collect(Collectors.toList());

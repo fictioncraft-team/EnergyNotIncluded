@@ -1,13 +1,24 @@
 package com.github.wintersteve25.energynotincluded.common.network;
 
-import net.minecraftforge.network.NetworkEvent;
+import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.client.gui.ONIBaseGuiTabModification;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public record PacketRenderError() implements CustomPacketPayload {
 
-public class PacketRenderError {
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(ONIBaseGuiTabModification::addError);
-        ctx.get().setPacketHandled(true);
+    public static final CustomPacketPayload.Type<PacketRenderError> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(ONIUtils.MODID, "renderError"));
+    public static final StreamCodec<ByteBuf, PacketRenderError> CODEC = StreamCodec.unit(new PacketRenderError());
+
+    public static void handle(PacketRenderError data, IPayloadContext context) {
+        context.enqueueWork(ONIBaseGuiTabModification::addError);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
