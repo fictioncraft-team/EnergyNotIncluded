@@ -1,15 +1,15 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding;
 
-import mekanism.client.render.RenderPropertiesProvider;
-import mekanism.common.util.WorldUtils;
+import com.github.wintersteve25.energynotincluded.ONIUtils;
+import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseBlock;
+import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -20,10 +20,9 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -31,14 +30,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.client.IBlockRenderProperties;
-import com.github.wintersteve25.energynotincluded.ONIUtils;
-import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseBlock;
-import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.Consumer;
 
 /**
  * Modified from https://github.com/mekanism/Mekanism/blob/1.18.x/src/main/java/mekanism/common/block/BlockBounding.java
@@ -50,26 +44,19 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
 
     @Nullable
     public static BlockPos getMainBlockPos(BlockGetter world, BlockPos thisPos) {
-        ONIBoundingTE te = WorldUtils.getTileEntity(ONIBoundingTE.class, world, thisPos);
-        return te != null && te.receivedCoords && !thisPos.equals(te.getMainPos()) ? te.getMainPos() : null;
+        if (!(world.getBlockEntity(thisPos) instanceof ONIBoundingTE te)) {
+            return null;
+        }
+
+        return te.receivedCoords && !thisPos.equals(te.getMainPos()) ? te.getMainPos() : null;
     }
 
     public ONIBoundingBlock() {
-        this(Properties.of(Material.METAL).strength(3.5F, 4.8F).requiresCorrectToolForDrops().dynamicShape().noOcclusion());
+        this(Properties.of().strength(3.5F, 4.8F).requiresCorrectToolForDrops().dynamicShape().noOcclusion());
     }
 
     public ONIBoundingBlock(Properties properties) {
         super(properties);
-    }
-
-    @Override
-    public boolean isFluidLoggable() {
-        return true;
-    }
-
-    @Override
-    public void initializeClient(Consumer<IBlockRenderProperties> consumer) {
-        consumer.accept(RenderPropertiesProvider.boundingParticles());
     }
 
     @Nonnull
@@ -78,15 +65,25 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
         return PushReaction.BLOCK;
     }
 
-    @Nonnull
     @Override
-    public InteractionResult use(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         BlockPos mainPos = getMainBlockPos(world, pos);
         if (mainPos == null) {
             return InteractionResult.FAIL;
         } else {
             BlockState state1 = world.getBlockState(mainPos);
-            return state1.getBlock().use(state1, world, mainPos, player, hand, hit);
+            return state1.useWithoutItem(world, player, hit);
+        }
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        BlockPos mainPos = getMainBlockPos(world, pos);
+        if (mainPos == null) {
+            return ItemInteractionResult.FAIL;
+        } else {
+            BlockState state1 = world.getBlockState(mainPos);
+            return state1.useItemOn(stack, world, player, hand, hit);
         }
     }
 
@@ -116,6 +113,8 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
         return mainState.getBlock().getCloneItemStack(mainState, target, world, mainPos, player);
     }
 
+
+
     @Override
     public boolean onDestroyedByPlayer(@Nonnull BlockState state, Level world, @Nonnull BlockPos pos, @Nonnull Player player, boolean willHarvest, FluidState fluidState) {
         if (willHarvest) {
@@ -139,16 +138,18 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
             BlockState mainState = world.getBlockState(mainPos);
             if (!mainState.isAir()) {
                 //Proxy the explosion to the main block which, will set it to air causing it to invalidate the rest of the bounding blocks
-                LootContext.Builder lootContextBuilder = new LootContext.Builder((ServerLevel) world)
-                        .withRandom(world.random)
-                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(mainPos))
-                        .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
-                        .withOptionalParameter(LootContextParams.BLOCK_ENTITY, mainState.hasBlockEntity() ? WorldUtils.getTileEntity(world, mainPos) : null)
-                        .withOptionalParameter(LootContextParams.THIS_ENTITY, explosion.getExploder());
-                if (explosion.blockInteraction == Explosion.BlockInteraction.DESTROY) {
-                    lootContextBuilder.withParameter(LootContextParams.EXPLOSION_RADIUS, explosion.radius);
+                if (world instanceof ServerLevel serverLevel) {
+                    LootParams.Builder lootContextBuilder = new LootParams.Builder(serverLevel)
+                            .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(mainPos))
+                            .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
+                            .withOptionalParameter(LootContextParams.BLOCK_ENTITY, mainState.hasBlockEntity() ? serverLevel.getBlockEntity(mainPos) : null)
+                            .withOptionalParameter(LootContextParams.THIS_ENTITY, explosion.getDirectSourceEntity());
+                    if (explosion.getBlockInteraction() == Explosion.BlockInteraction.DESTROY_WITH_DECAY) {
+                        lootContextBuilder.withParameter(LootContextParams.EXPLOSION_RADIUS, explosion.radius());
+                    }
+
+                    mainState.getDrops(lootContextBuilder).forEach(stack -> Block.popResource(serverLevel, mainPos, stack));
                 }
-                mainState.getDrops(lootContextBuilder).forEach(stack -> Block.popResource(world, mainPos, stack));
                 mainState.onBlockExploded(world, mainPos, explosion);
             }
         }
@@ -160,7 +161,7 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
         BlockPos mainPos = getMainBlockPos(world, pos);
         if (mainPos != null) {
             BlockState mainState = world.getBlockState(mainPos);
-            mainState.getBlock().playerDestroy(world, player, mainPos, mainState, WorldUtils.getTileEntity(world, mainPos), stack);
+            mainState.getBlock().playerDestroy(world, player, mainPos, mainState, world.getBlockEntity(mainPos), stack);
         } else {
             super.playerDestroy(world, player, pos, state, te, stack);
         }
@@ -172,7 +173,7 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
     public void neighborChanged(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Block neighborBlock, @Nonnull BlockPos neighborPos, boolean isMoving) {
         BlockPos mainPos = getMainBlockPos(world, pos);
         if (mainPos != null) {
-            world.getBlockState(mainPos).neighborChanged(world, mainPos, neighborBlock, neighborPos, isMoving);
+            world.getBlockState(mainPos).onNeighborChange(world, mainPos, neighborPos);
         }
     }
 
@@ -230,12 +231,8 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
 //    }
 
     @Override
-    public boolean isPathfindable(@Nonnull BlockState state, @Nonnull BlockGetter world, @Nonnull BlockPos pos, @Nonnull PathComputationType type) {
+    protected boolean isPathfindable(BlockState pState, PathComputationType pPathComputationType) {
         return false;
-    }
-
-    @Override
-    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
     }
 
     @Override

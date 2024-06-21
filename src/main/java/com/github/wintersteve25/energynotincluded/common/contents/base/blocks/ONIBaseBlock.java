@@ -1,96 +1,41 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
-import mekanism.common.block.states.IStateFluidLoggable;
-import mekanism.common.util.WorldUtils;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.ONIIForceStoppable;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IRenderTypeProvider;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IVoxelShapeProvider;
-import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class ONIBaseBlock extends Block implements IStateFluidLoggable {
+public class ONIBaseBlock extends Block implements SimpleWaterloggedBlock {
 
     // block builder properties
     private IVoxelShapeProvider hitBox;
     private IRenderTypeProvider renderType;
 
-    public ONIBaseBlock(int harvestLevel, float hardness, float resistance) {
-        this(harvestLevel, hardness, resistance, SoundType.STONE);
+    public ONIBaseBlock(int harvestLevel, float destroyTime, float explosionRes) {
+        this(harvestLevel, destroyTime, explosionRes, SoundType.STONE);
     }
 
-    public ONIBaseBlock(int harvestLevel, float hardness, float resistance, SoundType soundType) {
-        this(harvestLevel, hardness, resistance, soundType, Material.STONE);
-    }
-
-    public ONIBaseBlock(int harvestLevel, float hardness, float resistance, SoundType soundType, Material material) {
-        this(Properties.of(material).strength(hardness, resistance).sound(soundType));
+    public ONIBaseBlock(int harvestLevel, float destroyTime, float explosionRes, SoundType soundType) {
+        this(Properties.of().strength(destroyTime, explosionRes).sound(soundType));
     }
 
     public ONIBaseBlock(Properties properties) {
         super(properties);
-        if (isFluidLoggable()) {
-            BlockState state = this.getStateDefinition().any();
-            state = setState(state, Fluids.EMPTY);
-            this.registerDefaultState(state);
-        }
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        if (isFluidLoggable()) {
-            builder.add(this.getFluidLoggedProperty());
-        }
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext blockItemUseContext) {
-        if (isFluidLoggable()) {
-            BlockState state = super.getStateForPlacement(blockItemUseContext);
-            FluidState fluidState = blockItemUseContext.getLevel().getFluidState(blockItemUseContext.getClickedPos());
-            state = setState(state, fluidState.getType());
-            return state;
-        }
-        return super.getStateForPlacement(blockItemUseContext);
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        if (isFluidLoggable()) {
-            return this.getFluid(state);
-        }
-        return super.getFluidState(state);
-    }
-
-    @Override
-    public BlockState updateShape(@Nonnull BlockState state, @Nonnull Direction facing, @Nonnull BlockState facingState, @Nonnull LevelAccessor world, @Nonnull BlockPos currentPos, @Nonnull BlockPos facingPos) {
-        if (isFluidLoggable()) {
-            this.updateFluids(state, world, currentPos);
-        }
-        return super.updateShape(state, facing, facingState, world, currentPos, facingPos);
     }
 
     @Override
@@ -105,9 +50,7 @@ public class ONIBaseBlock extends Block implements IStateFluidLoggable {
 
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        ONIBaseTE tile = WorldUtils.getTileEntity(ONIBaseTE.class, worldIn, pos);
-
-        if (tile == null) {
+        if (!(worldIn.getBlockEntity(pos) instanceof ONIBaseTE tile)) {
             return;
         }
 
@@ -126,11 +69,6 @@ public class ONIBaseBlock extends Block implements IStateFluidLoggable {
         tile.onPlacedBy(worldIn, pos, state, placer, stack);
     }
 
-    @Override
-    public boolean canPlaceLiquid(@NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Fluid fluid) {
-        return isFluidLoggable() && IStateFluidLoggable.super.canPlaceLiquid(world, pos, state, fluid);
-    }
-
     public IVoxelShapeProvider getHitBox() {
         return hitBox;
     }
@@ -147,17 +85,13 @@ public class ONIBaseBlock extends Block implements IStateFluidLoggable {
         this.renderType = renderType;
     }
 
-    public boolean isFluidLoggable() {
-        return false;
-    }
+    protected <T extends BlockEntity> T getTileEntityOrThrow(Class<T> clazz, BlockGetter accessor, BlockPos pos) {
+        BlockEntity blockEntity = accessor.getBlockEntity(pos);
 
-    protected <T extends BlockEntity> T getTileEntityOrThrow(Class<T> type, BlockGetter accessor, BlockPos pos) {
-        T te = WorldUtils.getTileEntity(type, accessor, pos);
-
-        if (te == null) {
-            throw new IllegalStateException("Expected tile entity of type " + type + " at " + pos + " but none was found");
+        if (blockEntity == null || !clazz.isAssignableFrom(blockEntity.getClass())) {
+            throw new IllegalStateException("Expected tile entity of type at " + pos + " but none was found");
         }
 
-        return te;
+        return (T) blockEntity;
     }
 }

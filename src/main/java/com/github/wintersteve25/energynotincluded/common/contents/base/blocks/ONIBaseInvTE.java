@@ -4,13 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.ONIInventoryHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public abstract class ONIBaseInvTE extends ONIBaseTE {
 
@@ -48,12 +44,5 @@ public abstract class ONIBaseInvTE extends ONIBaseTE {
         tag.put("inv", itemHandler.serializeNBT());
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return itemLazyOptional.cast();
-        }
-        return super.getCapability(cap, side);
-    }
+
 }

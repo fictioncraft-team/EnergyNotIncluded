@@ -1,5 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerLevel;
@@ -18,14 +19,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.network.PacketDistributor;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.*;
 import com.github.wintersteve25.energynotincluded.common.network.ONINetworking;
 import com.github.wintersteve25.energynotincluded.common.network.PacketUpdateClientBE;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -104,7 +104,7 @@ public class ONIBaseTE extends BlockEntity {
                 }
             });
         } else {
-            ONINetworking.getInstance().send(PacketDistributor.TRACKING_CHUNK.with(() -> getLevel().getChunk(getBlockPos().getX() >> 4, getBlockPos().getZ() >> 4)), new PacketUpdateClientBE(this, getUpdateTag()));
+            ONINetworking.send(PacketDistributor..with(() -> getLevel().getChunk(getBlockPos().getX() >> 4, getBlockPos().getZ() >> 4)), new PacketUpdateClientBE(this, getUpdateTag()));
         }
     }
 
@@ -117,7 +117,7 @@ public class ONIBaseTE extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         if (this instanceof ONIIWorkable workable) {
             workable.setWorking(tag.getBoolean("isWorking"));
             if (this instanceof ONIIHasProgress hasProgress) {
@@ -131,11 +131,11 @@ public class ONIBaseTE extends BlockEntity {
             redstoneOutput.setLowThreshold(tag.getInt("low_threshold"));
             redstoneOutput.setHighThreshold(tag.getInt("high_threshold"));
         }
-        super.load(tag);
+        super.loadAdditional(tag, provider);
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         if (this instanceof ONIIWorkable workable) {
             tag.putBoolean("isWorking", workable.getWorking());
             if (this instanceof ONIIHasProgress hasProgress) {
@@ -164,11 +164,11 @@ public class ONIBaseTE extends BlockEntity {
             Block block = level.getBlockState(worldPosition).getBlock();
             if (block instanceof ONIBaseMachine b) {
                 ONIIHasGui gui = b.getGui();
-                return gui != null ? gui.machineName() : new TextComponent("");
+                return gui != null ? gui.machineName() : Component.literal("");
             }
         }
 
-        return new TextComponent("");
+        return Component.literal("");
     }
 
     public void onHarvested(Level world, BlockPos pos, BlockState state, Player player) {

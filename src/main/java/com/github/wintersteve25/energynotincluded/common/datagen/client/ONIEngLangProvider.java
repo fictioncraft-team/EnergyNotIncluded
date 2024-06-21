@@ -1,26 +1,18 @@
 package com.github.wintersteve25.energynotincluded.common.datagen.client;
 
-import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
-import net.minecraft.ChatFormatting;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.data.LanguageProvider;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import org.apache.commons.lang3.text.WordUtils;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.client.gui.ONIBaseGuiTab;
-import com.github.wintersteve25.energynotincluded.common.compat.curios.CuriosCompat;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.germ.api.EnumGermType;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.player_data.api.SkillType;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.player_data.api.TraitType;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.world_gas.api.chemistry.Element;
+import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registration.item.ONIItemRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIItems;
+import net.minecraft.ChatFormatting;
+import net.minecraft.data.PackOutput;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import org.apache.commons.lang3.text.WordUtils;
 
 public class ONIEngLangProvider extends LanguageProvider {
     public ONIEngLangProvider(PackOutput gen) {
@@ -123,24 +115,6 @@ public class ONIEngLangProvider extends LanguageProvider {
                 String name = i.getId().getPath();
                 add("item.oniutils." + name, WordUtils.capitalizeFully(name.replace("_", " ")));
             }
-        }
-
-        for (Element element : Element.values()) {
-            add("gas.oniutils." + element.getName(), element.getLang() + " Gas");
-        }
-
-        for (EnumGermType germType : EnumGermType.values()) {
-            add("germ.oniutils." + germType.getName(), WordUtils.capitalizeFully(germType.getName().replace("_", " ")));
-        }
-
-        for (SkillType skillType : SkillType.values()) {
-            String n = skillType.name().toLowerCase();
-            add("skill.oniutils." + n, WordUtils.capitalizeFully(n.replace("_", " ")));
-        }
-
-        for (TraitType traitType : TraitType.values()) {
-            String n = traitType.name().toLowerCase();
-            add("trait.oniutils." + n, WordUtils.capitalizeFully(n.replace("_", " ")));
         }
     }
 }

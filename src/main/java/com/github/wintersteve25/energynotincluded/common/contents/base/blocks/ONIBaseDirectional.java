@@ -1,11 +1,10 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
-import mekanism.common.util.VoxelShapeUtils;
+import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -13,9 +12,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.BlockGetter;
+import org.joml.Vector3d;
+
+import java.util.List;
 
 public class ONIBaseDirectional extends ONIBaseBlock {
 
@@ -25,19 +30,17 @@ public class ONIBaseDirectional extends ONIBaseBlock {
     private boolean allowVertical = false;
 
     public ONIBaseDirectional(int harvestLevel, float hardness, float resistance) {
-        this(harvestLevel, hardness, resistance, SoundType.STONE, Material.STONE);
+        this(harvestLevel, hardness, resistance, SoundType.STONE);
     }
 
-    public ONIBaseDirectional(int harvestLevel, float hardness, float resistance, SoundType soundType, Material material) {
-        this(Properties.of(material).strength(hardness, resistance).sound(soundType));
+    public ONIBaseDirectional(int harvestLevel, float hardness, float resistance, SoundType soundType) {
+        this(Properties.of().strength(hardness, resistance).sound(soundType));
     }
 
     public ONIBaseDirectional(Properties properties) {
         super(properties);
-
         BlockState state = this.getStateDefinition().any();
         state.setValue(FACING, Direction.NORTH);
-
         this.registerDefaultState(state);
     }
 
@@ -67,40 +70,38 @@ public class ONIBaseDirectional extends ONIBaseBlock {
         }
 
         state.setValue(FACING, blockItemUseContext.getNearestLookingDirection());
-
-        return allowVertical ? this.defaultBlockState().setValue(FACING, blockItemUseContext.getNearestLookingDirection()) : this.defaultBlockState().setValue(FACING, blockItemUseContext.getHorizontalDirection());
+        return allowVertical
+                ? this.defaultBlockState().setValue(FACING, blockItemUseContext.getNearestLookingDirection())
+                : this.defaultBlockState().setValue(FACING, blockItemUseContext.getHorizontalDirection());
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (autoRotateShape && getHitBox() != null) {
-            if (allowVertical) {
-                switch (state.getValue(FACING)) {
-                    case NORTH:
-                        return super.getShape(state, worldIn, pos, context);
-                    case EAST:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Rotation.CLOCKWISE_90);
-                    case SOUTH:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Rotation.CLOCKWISE_180);
-                    case WEST:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Rotation.COUNTERCLOCKWISE_90);
-                    case UP:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Direction.UP);
-                    case DOWN:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Direction.DOWN);
-                }
-            } else {
-                switch (state.getValue(FACING)) {
-                    case NORTH:
-                        return super.getShape(state, worldIn, pos, context);
-                    case EAST:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Rotation.CLOCKWISE_90);
-                    case SOUTH:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Rotation.CLOCKWISE_180);
-                    case WEST:
-                        return VoxelShapeUtils.rotate(super.getShape(state, worldIn, pos, context), Rotation.COUNTERCLOCKWISE_90);
-                }
+            int yrot = switch (state.getValue(FACING)) {
+                case SOUTH -> 180;
+                case WEST -> 90;
+                case EAST -> -90;
+                default -> 0;
+            };
+
+            VoxelShape shape = super.getShape(state, worldIn, pos, context);
+
+            if (yrot != 0) {
+                shape = MiscHelper.rotateShape(shape, yrot, new Vector3d(0, 1, 0));
             }
+
+            if (allowVertical) {
+                int xrot = switch (state.getValue(FACING)) {
+                    case UP -> 90;
+                    case DOWN -> -90;
+                    default -> 0;
+                };
+
+                shape = MiscHelper.rotateShape(shape, xrot, new Vector3d(1, 0, 0));
+            }
+
+            return shape;
         }
         return super.getShape(state, worldIn, pos, context);
     }

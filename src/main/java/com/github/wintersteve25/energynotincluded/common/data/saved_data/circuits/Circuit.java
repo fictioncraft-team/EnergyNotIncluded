@@ -1,5 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.data.saved_data.circuits;
 
+import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
@@ -31,6 +32,9 @@ public class Circuit {
         this.dynamics = dynamics;
         this.id = id;
         this.powerTransferLimit = powerTransferLimit;
+    }
+
+    private Circuit() {
     }
 
     public static Circuit createCircuit(Level world, int powerTransferLimit) {
@@ -185,26 +189,30 @@ public class Circuit {
             if (cablePoses == null) throw new IllegalArgumentException();
             cables = new ArrayList<>();
             for (Tag pos : cablePoses) {
-                cables.add(NbtUtils.readBlockPos((CompoundTag) pos));
+                cables.add(MiscHelper.readBlockPos(pos));
             }
+
             ListTag consumerPoses = (ListTag) nbt.get("consumerPoses");
             if (consumerPoses == null) throw new IllegalArgumentException();
             consumers = new ArrayList<>();
             for (Tag pos : consumerPoses) {
-                consumers.add(NbtUtils.readBlockPos((CompoundTag) pos));
+                consumers.add(MiscHelper.readBlockPos(pos));
             }
+
             ListTag producerPoses = (ListTag) nbt.get("producerPoses");
             if (producerPoses == null) throw new IllegalArgumentException();
             producers = new ArrayList<>();
             for (Tag pos : producerPoses) {
-                producers.add(NbtUtils.readBlockPos((CompoundTag) pos));
+                producers.add(MiscHelper.readBlockPos(pos));
             }
+
             ListTag dynamicPoses = (ListTag) nbt.get("dynamicPoses");
             if (dynamicPoses == null) throw new IllegalArgumentException();
             dynamics = new ArrayList<>();
             for (Tag pos : dynamicPoses) {
-                dynamics.add(NbtUtils.readBlockPos((CompoundTag) pos));
+                dynamics.add(MiscHelper.readBlockPos(pos));
             }
+
             id = nbt.getInt("circuitID");
             powerTransferLimit = nbt.getInt("powerTransferLimit");
         } catch (Throwable e){
@@ -214,39 +222,8 @@ public class Circuit {
     }
 
     public static Circuit readFromNBT(CompoundTag nbt) {
-        try {
-            ListTag cablePoses = (ListTag) nbt.get("cablePoses");
-            if (cablePoses == null) throw new IllegalArgumentException();
-            List<BlockPos> cables = new ArrayList<>();
-            for (Tag pos : cablePoses) {
-                cables.add(NbtUtils.readBlockPos((CompoundTag) pos));
-            }
-            ListTag consumerPoses = (ListTag) nbt.get("consumerPoses");
-            if (consumerPoses == null) throw new IllegalArgumentException();
-            List<BlockPos> consumers = new ArrayList<>();
-            for (Tag pos : consumerPoses) {
-                consumers.add(NbtUtils.readBlockPos((CompoundTag) pos));
-            }
-            ListTag producerPoses = (ListTag) nbt.get("producerPoses");
-            if (producerPoses == null) throw new IllegalArgumentException();
-            List<BlockPos> producers = new ArrayList<>();
-            for (Tag pos : producerPoses) {
-                producers.add(NbtUtils.readBlockPos((CompoundTag) pos));
-            }
-            ListTag dynamicPoses = (ListTag) nbt.get("dynamicPoses");
-            if (dynamicPoses == null) throw new IllegalArgumentException();
-            List<BlockPos> dynamics = new ArrayList<>();
-            for (Tag pos : dynamicPoses) {
-                dynamics.add(NbtUtils.readBlockPos((CompoundTag) pos));
-            }
-            int ID = nbt.getInt("circuitID");
-            int powerTransferLimit = nbt.getInt("powerTransferLimit");
-            return new Circuit(cables, consumers, producers, dynamics, ID, powerTransferLimit);
-        } catch (Throwable e){
-            ONIUtils.LOGGER.error("Error reading world circuit NBT: {}", nbt);
-            e.printStackTrace();
-        }
-
-        return null;
+        Circuit circuit = new Circuit();
+        circuit.read(nbt);
+        return circuit;
     }
 }

@@ -1,8 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.interfaces;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import com.github.wintersteve25.tau.menu.TauMenuHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -13,7 +11,7 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ON
  * Or to be used in {@link com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIBlockBuilder#container(ONIIHasGui)}
  */
 public interface ONIIHasGui {
-    AbstractContainerMenu container(int i, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity);
+    TauMenuHolder container(Level world, BlockPos pos);
 
     Component machineName();
 }

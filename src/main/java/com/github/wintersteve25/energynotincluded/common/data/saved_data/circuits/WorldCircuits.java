@@ -1,6 +1,9 @@
 package com.github.wintersteve25.energynotincluded.common.data.saved_data.circuits;
 
+import com.github.wintersteve25.energynotincluded.common.utils.SerializableMap;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.core.BlockPos;
@@ -17,44 +20,35 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WorldCircuits extends SavedData {
-    private Map<Integer, Circuit> circuits = new HashMap<>();
+
+    private static final String circuitsSerializationKey = "circuits";
+    private static final String idSerializationKey = "circuitsID";
+
+    private SerializableMap<Integer, Circuit> circuits;
     private int ID = 0;
 
     public WorldCircuits() {
+        circuits = new SerializableMap<>(
+                IntTag::valueOf,
+                Circuit::write,
+                t -> {
+                    if (t instanceof IntTag intTag) {
+                        return intTag.getAsInt();
+                    }
+
+                    ONIUtils.LOGGER.error("Failed to read circuit ID data from NBT");
+                    return 0;
+                },
+                t -> Circuit.readFromNBT((CompoundTag) t),
+                CompoundTag.TAG_INT,
+                CompoundTag.TAG_COMPOUND
+        );
     }
 
-    public WorldCircuits(CompoundTag tag) {
-        try {
-            ListTag cablePoses = (ListTag) tag.get("oni_circuits");
-            if (cablePoses == null) {
-                ONIUtils.LOGGER.error("Tried to read world circuit data but no data is present");
-                return;
-            }
-            circuits = new HashMap<>();
-            for (Tag pos : cablePoses) {
-                Circuit circuit = Circuit.readFromNBT((CompoundTag) pos);
-                if (circuit != null) {
-                    circuits.putIfAbsent(circuit.getId(), circuit);
-                }
-            }
-        } catch (ClassCastException e) {
-            ONIUtils.LOGGER.error("Error reading world circuit NBT: {}", tag);
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public CompoundTag save(CompoundTag pCompoundTag) {
-        ListTag cablePoses = new ListTag();
-
-        for (Circuit circ : circuits.values()) {
-            cablePoses.add(circ.write());
-        }
-
-        pCompoundTag.put("oni_circuits", cablePoses);
-        pCompoundTag.putInt("oni_circuits_id", ID);
-
-        return pCompoundTag;
+    public WorldCircuits(CompoundTag tag, HolderLookup.Provider pRegistries) {
+        this();
+        circuits.deserializeNBT(pRegistries, (CompoundTag) tag.get(circuitsSerializationKey));
+        ID = tag.getInt(idSerializationKey);
     }
 
     public void addCircuits(Circuit... circuits) {
@@ -66,9 +60,7 @@ public class WorldCircuits extends SavedData {
 
     public void replaceAndAddCircuits(Circuit... circuits) {
         for (Circuit circuit : circuits) {
-            if (!MiscHelper.getKeysByValue(this.circuits, circuit).isEmpty()) {
-                this.circuits.remove(circuit.getId());
-            }
+            this.circuits.remove(circuit.getId());
             this.circuits.put(circuit.getId(), circuit);
         }
         setDirty();
@@ -90,8 +82,8 @@ public class WorldCircuits extends SavedData {
     public Circuit getCircuitWithCableAtPos(BlockPos pos) {
         return circuits.values().stream()
                 .filter((circuit) -> circuit.getCables().contains(pos))
-                .collect(Collectors.toList())
-                .get(0);
+                .findFirst()
+                .get();
     }
 
     public int getNextID() {
@@ -99,8 +91,15 @@ public class WorldCircuits extends SavedData {
         return ID++;
     }
 
+    @Override
+    public CompoundTag save(CompoundTag pTag, HolderLookup.Provider pRegistries) {
+        pTag.put(circuitsSerializationKey, circuits.serializeNBT(pRegistries));
+        pTag.putInt(idSerializationKey, ID);
+        return pTag;
+    }
+
     public static WorldCircuits get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
-        return storage.computeIfAbsent(WorldCircuits::new, WorldCircuits::new, "oni_world_circuits");
+        return storage.computeIfAbsent(new Factory<>(WorldCircuits::new, WorldCircuits::new), "oni_world_circuits");
     }
 }

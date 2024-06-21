@@ -1,8 +1,5 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding;
 
-import mekanism.api.NBTConstants;
-import mekanism.common.util.NBTUtils;
-import mekanism.common.util.WorldUtils;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -10,8 +7,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseTE;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 
@@ -54,12 +49,7 @@ public class ONIBoundingTE extends ONIBaseTE {
 
     @Nullable
     public BlockEntity getMainTile() {
-        return this.receivedCoords ? WorldUtils.getTileEntity(this.level, this.getMainPos()) : null;
-    }
-
-    @Nullable
-    public ONIBaseTE getMainONITile() {
-        return this.receivedCoords ? WorldUtils.getTileEntity(ONIBaseTE.class, this.level, this.getMainPos()) : null;
+        return this.receivedCoords ? this.level.getBlockEntity(this.getMainPos()) : null;
     }
 
     @Override

@@ -11,6 +11,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.network.chat.TranslatableComponent;
 import com.github.wintersteve25.energynotincluded.common.data.capabilities.germ.api.EnumGermType;
@@ -46,14 +47,14 @@ public class SetGermAmountCommands implements Command<CommandSourceStack> {
         String name = StringArgumentType.getString(context, "germType");
 
         if (name.isEmpty()) {
-            context.getSource().sendSuccess(new TranslatableComponent("oniutils.commands.germs.set.failed.typeIsNull"), true);
+            context.getSource().sendSuccess(() -> Component.translatable("oniutils.commands.germs.set.failed.typeIsNull"), true);
         }
 
         target.getCapability(ONICapabilities.GERMS).ifPresent(t -> {
             t.setGerm(EnumGermType.getGermFromName(name), amount);
         });
 
-        context.getSource().sendSuccess(new TranslatableComponent("oniutils.commands.germs.set.success", amount, LangHelper.germ(name)), true);
+        context.getSource().sendSuccess(() -> Component.translatable("oniutils.commands.germs.set.success", amount, LangHelper.germ(name)), true);
 
         return 1;
     }

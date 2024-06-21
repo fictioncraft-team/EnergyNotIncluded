@@ -1,5 +1,9 @@
 package com.github.wintersteve25.energynotincluded.common.utils.helpers;
 
+import com.mojang.math.Axis;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
@@ -7,6 +11,13 @@ import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIBoundingTE;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -50,46 +61,40 @@ public class MiscHelper {
         }
     }
 
-    public static <K, V> HashMap<K, V> newHashmap(List<K> keys, List<V> values) {
-        HashMap<K, V> map = new HashMap<>();
-
-        for (int i = 0; i < keys.size(); i++) {
-            try {
-                map.put(keys.get(i), values.get(i));
-            } catch (ArrayIndexOutOfBoundsException e) {
-                return map;
-            }
+    public static BlockPos readBlockPos(Tag tag) {
+        if (tag instanceof IntArrayTag intTags) {
+            int[] aint = intTags.getAsIntArray();
+            return aint.length == 3 ? new BlockPos(aint[0], aint[1], aint[2]) : null;
         }
 
-        return map;
+        return null;
     }
 
-    /**
-     * @return returns a new list that contains all the object in the first list that isn'packetModType in the second list
-     */
-    public static <E> List<E> filterList(Collection<E> list, Collection<E> other) {
-        return list.stream().filter(obj -> !other.contains(obj)).collect(Collectors.toList());
-    }
+    public static VoxelShape rotateShape(VoxelShape shape, double degrees, Vector3d axis) {
+        VoxelShape result = Shapes.empty();
 
-    public static <T, E> List<T> getKeysByValue(Map<T, E> map, E value) {
-        return map.entrySet()
-                .stream()
-                .filter(entry -> Objects.equals(entry.getValue(), value))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-    }
+        AABB boundingBox = shape.bounds();
+        Vector3d minbb = new Vector3d(boundingBox.minX, boundingBox.minY, boundingBox.minZ);
+        Vector3d maxbb = new Vector3d(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
+        Vector3d center = maxbb.sub(minbb).div(2);
 
-    public static double distEuclidean(BlockPos pos1, BlockPos pos2) {
-        return Math.sqrt(
-                Math.pow(pos2.getX() - pos1.getX(), 2) + Math.pow(pos2.getY() - pos1.getY(), 2) + Math.pow(pos2.getZ() - pos1.getZ(), 2)
-        );
-    }
+        Quaterniond rot = new Quaterniond()
+                .rotateAxis(org.joml.Math.toRadians(degrees), axis);
 
-    public static boolean chanceHandling(float chance) {
-        return chanceHandling(new Random(), chance);
-    }
+        for (AABB aabb : shape.toAabbs()) {
+            Vector3d min = new Vector3d(aabb.minX, aabb.minY, aabb.minZ);
+            Vector3d max = new Vector3d(aabb.maxX, aabb.maxY, aabb.maxZ);
 
-    public static boolean chanceHandling(Random rand, float chance) {
-        return rand.nextDouble() < chance;
+            min.sub(center) // center to origin
+                .rotate(rot) // rotate
+                .add(center); // move back
+
+            max.sub(center).rotate(rot).add(center);
+
+            VoxelShape rotated = Shapes.box(min.x, min.y, min.z, max.x, max.y, max.z);
+            result = Shapes.or(result, rotated);
+        }
+
+        return result.optimize();
     }
 }

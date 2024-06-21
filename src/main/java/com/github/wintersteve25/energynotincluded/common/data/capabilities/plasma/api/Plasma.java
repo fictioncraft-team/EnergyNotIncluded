@@ -1,6 +1,8 @@
 package com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.UnknownNullability;
 
 public class Plasma implements IPlasma {
 
@@ -74,17 +76,15 @@ public class Plasma implements IPlasma {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag nbt = new CompoundTag();
-
         nbt.putInt("power", power);
         nbt.putString("type", type.name());
-
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag nbt) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         this.power = nbt.getInt("power");
         this.type = EnumPlasmaTileType.valueOf(nbt.getString("type"));
     }

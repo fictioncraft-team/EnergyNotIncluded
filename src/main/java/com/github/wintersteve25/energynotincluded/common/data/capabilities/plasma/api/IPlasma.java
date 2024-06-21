@@ -1,7 +1,7 @@
 package com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
 public interface IPlasma extends INBTSerializable<CompoundTag> {
     void addPower(int power);
