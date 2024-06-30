@@ -2,6 +2,7 @@ package com.github.wintersteve25.energynotincluded.common.contents.modules.recip
 
 import com.github.wintersteve25.energynotincluded.common.registries.ONIRecipes;
 import com.github.wintersteve25.energynotincluded.common.utils.PartialItemIngredient;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -22,7 +23,7 @@ public record BlueprintRecipe(ResourceLocation id, NonNullList<PartialItemIngred
     }
 
     @Override
-    public ItemStack assemble(Container pContainer) {
+    public ItemStack assemble(Container pContainer, HolderLookup.Provider registeries) {
         return ItemStack.EMPTY;
     }
 
@@ -32,13 +33,8 @@ public record BlueprintRecipe(ResourceLocation id, NonNullList<PartialItemIngred
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
     }
 
     @Override
