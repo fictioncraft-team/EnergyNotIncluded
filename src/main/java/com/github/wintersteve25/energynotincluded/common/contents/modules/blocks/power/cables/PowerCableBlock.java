@@ -22,7 +22,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseSixWaysBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.enums.EnumCableTypes;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api.IPlasma;
+import com.github.wintersteve25.energynotincluded.common.data.plasma.api.IPlasma;
 import com.github.wintersteve25.energynotincluded.common.data.saved_data.circuits.Circuit;
 import com.github.wintersteve25.energynotincluded.common.data.saved_data.circuits.WorldCircuits;
 import com.github.wintersteve25.energynotincluded.common.registries.ONICapabilities;

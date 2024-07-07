@@ -1,8 +1,7 @@
 package com.github.wintersteve25.energynotincluded;
 
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
-import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
-import com.github.wintersteve25.energynotincluded.common.registries.ONIItems;
+import com.github.wintersteve25.energynotincluded.common.registries.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -17,9 +16,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.github.wintersteve25.energynotincluded.common.registries.ONIConfig;
 import com.github.wintersteve25.energynotincluded.common.events.ONIServerEventsHandler;
-import com.github.wintersteve25.energynotincluded.common.registration.Registration;
 
 @Mod(ONIUtils.MODID)
 public class ONIUtils {
@@ -41,15 +38,23 @@ public class ONIUtils {
             })
             .build());
 
-    public ONIUtils(final IEventBus modEventBus) {
+    public ONIUtils(final IEventBus eventBus) {
         final IEventBus forgeEventBus = NeoForge.EVENT_BUS;
 
         ModLoadingContext.get().getActiveContainer().registerConfig(ModConfig.Type.SERVER, ONIConfig.Server.SERVER_CONFIG);
-        Registration.init(modEventBus);
-        TAB_REGISTER.register(modEventBus);
+        ONITags.register();
 
-        modEventBus.addListener(ONIServerEventsHandler::commonSetup);
+        ONIBlocks.register(eventBus);
+        ONIItems.register(eventBus);
+        ONISounds.register(eventBus);
+        ONIRecipes.register(eventBus);
+        TAB_REGISTER.register(eventBus);
+
+        eventBus.addListener(ONIServerEventsHandler::commonSetup);
+        eventBus.addListener(ONIServerEventsHandler::registerPayloads);
         forgeEventBus.addListener(ONIServerEventsHandler::command);
+
+        ONIUtils.LOGGER.info("ONIUtils Registration Completed");
     }
 
     public static Item.Properties defaultProperties() {

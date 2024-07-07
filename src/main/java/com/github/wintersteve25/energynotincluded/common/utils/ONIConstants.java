@@ -133,8 +133,4 @@ public final class ONIConstants {
             return false;
         }
     }
-
-    public static final class Tags {
-        public static final ResourceLocation PLANET_SPAWNABLE_STRUCTURE = new ResourceLocation(ONIUtils.MODID, "planet_structure");
-    }
 }

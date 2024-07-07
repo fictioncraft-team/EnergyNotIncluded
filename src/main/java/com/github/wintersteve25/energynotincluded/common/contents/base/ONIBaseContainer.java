@@ -18,7 +18,7 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseInvTE;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseTE;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.*;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api.IPlasma;
+import com.github.wintersteve25.energynotincluded.common.data.plasma.api.IPlasma;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ONIModificationItem;
 import com.github.wintersteve25.energynotincluded.common.registries.ONICapabilities;
 import com.github.wintersteve25.energynotincluded.common.utils.SlotArrangement;

@@ -1,6 +1,5 @@
 package com.github.wintersteve25.energynotincluded.common.registries;
 
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ONIConfig {

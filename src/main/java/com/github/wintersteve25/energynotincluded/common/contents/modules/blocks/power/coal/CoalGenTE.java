@@ -34,11 +34,10 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.*;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api.EnumPlasmaTileType;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api.IPlasma;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api.Plasma;
+import com.github.wintersteve25.energynotincluded.common.data.plasma.api.EnumPlasmaTileType;
+import com.github.wintersteve25.energynotincluded.common.data.plasma.api.IPlasma;
+import com.github.wintersteve25.energynotincluded.common.data.plasma.api.Plasma;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseInvTE;
-import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseLoggableMachine;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIBlockBuilder;
 import com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIContainerBuilder;
@@ -84,7 +83,7 @@ public class CoalGenTE extends ONIBaseInvTE implements IAnimatable, ONIITickable
     public CoalGenTE(BlockPos pos, BlockState state) {
         super(ONIBlocks.Machines.Power.COAL_GEN_TE.get(), pos, state);
     }
-
+    
     @Override
     public void serverTick() {
         if (getLevel() != null) {

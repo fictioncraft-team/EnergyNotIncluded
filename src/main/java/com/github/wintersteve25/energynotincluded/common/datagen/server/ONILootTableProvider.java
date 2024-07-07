@@ -1,27 +1,45 @@
 package com.github.wintersteve25.energynotincluded.common.datagen.server;
 
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.data.DataGenerator;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
-public class ONILootTableProvider extends LootTableBase {
-    public ONILootTableProvider(DataGenerator p_i50789_1_) {
-        super(p_i50789_1_);
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+
+public class ONILootTableProvider extends BlockLootSubProvider {
+
+    public static LootTableProvider create(PackOutput output, CompletableFuture<HolderLookup.Provider> provider) {
+        return new LootTableProvider(output, Set.of(), List.of(new LootTableProvider.SubProviderEntry(ONILootTableProvider::new, LootContextParamSets.BLOCK)), provider);
+    }
+
+    protected ONILootTableProvider() {
+        super(Set.of(), FeatureFlags.REGISTRY.allFlags());
     }
 
     @Override
-    protected void addTables() {
-        standardTables();
-    }
-
-    private void standardTables() {
+    protected void generate() {
         for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
             ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
-            if (data.isDoLootTableGen()) {
-                Block block = b.block().get();
-                lootTables.putIfAbsent(block, createStandardTable(b.block().getId().getPath(), block));
+            if (data.lootTableBehaviour().behaviour() == LootTableBehaviour.DONT_GENERATE) {
+                continue;
+            }
+
+            Block block = b.block().get();
+            
+            switch (data.lootTableBehaviour().behaviour()) {
+                case SELF -> this.dropSelf(block);
+                case SILKTOUCH -> this.dropWhenSilkTouch(block);
+                case OTHER -> this.dropOther(block, Objects.requireNonNull(data.lootTableBehaviour().other()));
             }
         }
     }

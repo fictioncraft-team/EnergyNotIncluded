@@ -1,4 +1,4 @@
-package com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api;
+package com.github.wintersteve25.energynotincluded.common.data.plasma.api;
 
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;

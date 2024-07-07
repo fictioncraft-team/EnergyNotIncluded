@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.plasma.api.EnumPlasmaTileType;
+import com.github.wintersteve25.energynotincluded.common.data.plasma.api.EnumPlasmaTileType;
 
 import java.util.ArrayList;
 import java.util.List;

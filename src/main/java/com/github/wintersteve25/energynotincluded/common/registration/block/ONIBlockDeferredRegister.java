@@ -1,5 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.registration.block;
 
+import com.github.wintersteve25.energynotincluded.common.datagen.server.LootTableDrop;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -31,8 +32,8 @@ public class ONIBlockDeferredRegister {
         return registerDefaultProperties(name, blockSupplier, ONIBaseItemBlock::new);
     }
 
-    public <B extends Block> DeferredBlock<B, ONIBaseItemBlock> register(String name, Supplier<B> blockSupplier, boolean doStateGen, boolean doModelGen, boolean doLangGen, boolean doLootableGen) {
-        return registerDefaultProperties(name, blockSupplier, ONIBaseItemBlock::new, doStateGen, doModelGen, doLangGen, doLootableGen);
+    public <B extends Block> DeferredBlock<B, ONIBaseItemBlock> register(String name, Supplier<B> blockSupplier, boolean doStateGen, boolean doModelGen, boolean doLangGen, LootTableDrop lootTable) {
+        return registerDefaultProperties(name, blockSupplier, ONIBaseItemBlock::new, doStateGen, doModelGen, doLangGen, lootTable);
     }
 
     public <B extends Block> DeferredBlock<B, ONIBaseItemBlock> register(String name, Supplier<B> blockSupplier, ONIBlockRegistryData data) {
@@ -43,8 +44,8 @@ public class ONIBlockDeferredRegister {
         return register(name, blockSupplier, block -> itemCreator.apply(block, ONIUtils.defaultProperties()));
     }
 
-    public <B extends Block, I extends BlockItem> DeferredBlock<B, I> registerDefaultProperties(String name, Supplier<B> blockSupplier, BiFunction<B, Item.Properties, I> itemCreator, boolean doStateGen, boolean doModelGen, boolean doLangGen, boolean doLootableGen) {
-        return register(name, blockSupplier, block -> itemCreator.apply(block, ONIUtils.defaultProperties()), doStateGen, doModelGen, doLangGen, doLootableGen);
+    public <B extends Block, I extends BlockItem> DeferredBlock<B, I> registerDefaultProperties(String name, Supplier<B> blockSupplier, BiFunction<B, Item.Properties, I> itemCreator, boolean doStateGen, boolean doModelGen, boolean doLangGen, LootTableDrop lootTable) {
+        return register(name, blockSupplier, block -> itemCreator.apply(block, ONIUtils.defaultProperties()), doStateGen, doModelGen, doLangGen, lootTable);
     }
 
     public <B extends Block, I extends BlockItem> DeferredBlock<B, I> registerDefaultProperties(String name, Supplier<B> blockSupplier, BiFunction<B, Item.Properties, I> itemCreator, ONIBlockRegistryData data) {
@@ -52,11 +53,11 @@ public class ONIBlockDeferredRegister {
     }
 
     public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator) {
-        return register(name, blockSupplier, itemCreator, false, true, true, true);
+        return register(name, blockSupplier, itemCreator, false, true, true, LootTableDrop.dropSelf());
     }
 
-    public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator, boolean doStateGen, boolean doModelGen, boolean doLangGen, boolean doLootableGen) {
-        return register(name, blockSupplier, itemCreator, new ONIBlockRegistryData(doStateGen, doModelGen, doLangGen, doLootableGen));
+    public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator, boolean doStateGen, boolean doModelGen, boolean doLangGen, LootTableDrop lootTable) {
+        return register(name, blockSupplier, itemCreator, new ONIBlockRegistryData(doStateGen, doModelGen, doLangGen, lootTable));
     }
 
     public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator, ONIBlockRegistryData registryData) {

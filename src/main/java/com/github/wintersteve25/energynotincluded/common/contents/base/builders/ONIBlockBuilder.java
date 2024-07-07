@@ -1,6 +1,7 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.builders;
 
 import com.github.wintersteve25.energynotincluded.common.contents.base.ONIItemCategory;
+import com.github.wintersteve25.energynotincluded.common.datagen.server.LootTableDrop;
 import net.minecraft.util.Tuple;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
@@ -33,7 +34,7 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
     private boolean doStateGen = false;
     private boolean doModelGen = true;
     private boolean doLangGen = true;
-    private boolean doLootableGen = true;
+    private LootTableDrop lootTableDrop = LootTableDrop.dropSelf();
 
     public ONIBlockBuilder(String regName, Supplier<T> block) {
         this(regName, block, null, false);
@@ -125,8 +126,8 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
         return this;
     }
 
-    public ONIBlockBuilder<T> noLootableGen() {
-        doLootableGen = false;
+    public ONIBlockBuilder<T> lootTable(LootTableDrop drop) {
+        lootTableDrop = drop;
         return this;
     }
 
@@ -158,7 +159,7 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
         return doLangGen;
     }
 
-    public boolean isDoLootableGen() {
-        return doLootableGen;
+    public LootTableDrop getLootTableDrop() {
+        return lootTableDrop;
     }
 }

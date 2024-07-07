@@ -19,7 +19,7 @@ public class ONIDataGen {
         DataGenerator gen = event.getGenerator();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
-        gen.addProvider(event.includeServer(), new ONILootTableProvider(gen));
+        gen.addProvider(event.includeServer(), ONILootTableProvider.create(gen.getPackOutput(), event.getLookupProvider()));
 
         gen.addProvider(event.includeClient(), new ONIStateProvider(gen.getPackOutput(), existingFileHelper));
         gen.addProvider(event.includeClient(), new ONIModelProvider(gen.getPackOutput(), existingFileHelper));
