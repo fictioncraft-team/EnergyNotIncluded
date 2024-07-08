@@ -8,6 +8,7 @@ import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.data.PackOutput;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -95,10 +96,9 @@ public class ONIEngLangProvider extends LanguageProvider {
     }
 
     private void autoGenLang() {
-        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
-            ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
-            if (data.isDoLangGen()) {
-                String name = b.block().getId().getPath();
+        for (Tuple<ONIBlockDeferredRegister.DeferredBlock<?, ?>, ONIBlockRegistryData> b : ONIBlocks.BLOCKS.getAllBlocks()) {
+            if (b.getB().isDoLangGen()) {
+                String name = b.getA().block().getId().getPath();
                 add("block.oniutils." + name, WordUtils.capitalizeFully(name.replace("_", " ")));
             }
         }

@@ -2,6 +2,7 @@ package com.github.wintersteve25.energynotincluded.common.registration.block;
 
 import com.github.wintersteve25.energynotincluded.common.datagen.server.LootTableDrop;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -11,8 +12,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -21,7 +22,7 @@ public class ONIBlockDeferredRegister {
 
     private final DeferredRegister<Block> blocks;
     private final DeferredRegister<Item> blockItems;
-    private final Map<DeferredBlock<?, ?>, ONIBlockRegistryData> allBlocks = new HashMap<>();
+    private final List<Tuple<DeferredBlock<?, ?>, ONIBlockRegistryData>> allBlocks = new ArrayList<>();
 
     public ONIBlockDeferredRegister(String modid) {
         this.blocks = DeferredRegister.create(Registries.BLOCK, modid);
@@ -62,15 +63,15 @@ public class ONIBlockDeferredRegister {
 
     public <B extends Block, I extends BlockItem> DeferredBlock<B, I> register(String name, Supplier<B> blockSupplier, Function<B, I> itemCreator, ONIBlockRegistryData registryData) {
         DeferredHolder<Block, B> blockHolder = blocks.register(name, blockSupplier);
-        DeferredHolder<Item, I> itemHolder = blockItems.register(name, () -> itemCreator.apply(blockSupplier.get()));
+        DeferredHolder<Item, I> itemHolder = blockItems.register(name, () -> itemCreator.apply(blockHolder.get()));
         DeferredBlock<B, I> registeredBlock = new DeferredBlock<>(blockHolder, itemHolder);
-        allBlocks.put(registeredBlock, registryData);
+        allBlocks.add(new Tuple<>(registeredBlock, registryData));
         return registeredBlock;
     }
 
     public record DeferredBlock<B extends Block, I extends BlockItem>(DeferredHolder<Block, B> block, DeferredHolder<Item, I> blockItem) {}
 
-    public Map<DeferredBlock<?, ?>, ONIBlockRegistryData> getAllBlocks() {
+    public List<Tuple<DeferredBlock<?, ?>, ONIBlockRegistryData>> getAllBlocks() {
         return allBlocks;
     }
 

@@ -5,6 +5,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
@@ -28,18 +29,19 @@ public class ONILootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
-            ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
-            if (data.lootTableBehaviour().behaviour() == LootTableBehaviour.DONT_GENERATE) {
+        for (Tuple<ONIBlockDeferredRegister.DeferredBlock<?, ?>, ONIBlockRegistryData> b : ONIBlocks.BLOCKS.getAllBlocks()) {
+            LootTableDrop drop = b.getB().lootTableBehaviour();
+            
+            if (drop.behaviour() == LootTableBehaviour.DONT_GENERATE) {
                 continue;
             }
 
-            Block block = b.block().get();
+            Block block = b.getA().block().get();
             
-            switch (data.lootTableBehaviour().behaviour()) {
+            switch (drop.behaviour()) {
                 case SELF -> this.dropSelf(block);
                 case SILKTOUCH -> this.dropWhenSilkTouch(block);
-                case OTHER -> this.dropOther(block, Objects.requireNonNull(data.lootTableBehaviour().other()));
+                case OTHER -> this.dropOther(block, Objects.requireNonNull(drop.other()));
             }
         }
     }

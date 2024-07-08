@@ -11,6 +11,7 @@ import com.github.wintersteve25.energynotincluded.common.utils.helpers.ModelFile
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.ResoureceLocationHelper;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
@@ -28,13 +29,12 @@ public class ONIStateProvider extends BlockStateProvider {
     }
 
     private void autoGenStatesAndModels() {
-        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
-            ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
-            if (data.isDoStateGen()) {
-                if (b.block().get() instanceof ONIBaseDirectional directional && data instanceof ONIDirectionalBlockRegistryData directionalData) {
+        for (Tuple<ONIBlockDeferredRegister.DeferredBlock<?, ?>, ONIBlockRegistryData> b : ONIBlocks.BLOCKS.getAllBlocks()) {
+            if (b.getB().isDoStateGen()) {
+                if (b.getA().block().get() instanceof ONIBaseDirectional directional && b.getB() instanceof ONIDirectionalBlockRegistryData directionalData) {
                     directionalBlock(directional, directionalData.getModelFile(), directionalData.getAngleOffset());
                 } else {
-                    simpleBlock(b.block().get());
+                    simpleBlock(b.getA().block().get());
                 }
             }
         }

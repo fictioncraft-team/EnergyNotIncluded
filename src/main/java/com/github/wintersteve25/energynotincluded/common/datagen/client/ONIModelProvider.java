@@ -2,6 +2,7 @@ package com.github.wintersteve25.energynotincluded.common.datagen.client;
 
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
 import net.minecraft.data.PackOutput;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIIItem;
@@ -35,12 +36,11 @@ public class ONIModelProvider extends ItemModelProvider {
     }
 
     private void autoGenModels() {
-        for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
-            ONIBlockRegistryData data = ONIBlocks.BLOCKS.getAllBlocks().get(b);
-            if (data.isDoModelGen()) {
-                String name = b.block().getId().getPath();
+        for (Tuple<ONIBlockDeferredRegister.DeferredBlock<?, ?>, ONIBlockRegistryData> b : ONIBlocks.BLOCKS.getAllBlocks()) {
+            if (b.getB().isDoModelGen()) {
+                String name = b.getA().block().getId().getPath();
 
-                if (data instanceof ONIDirectionalBlockRegistryData directionalData) {
+                if (b.getB() instanceof ONIDirectionalBlockRegistryData directionalData) {
                     withExistingParent(name, directionalData.getModelFile().getLocation());
                 } else {
                     withExistingParent(name, modLoc("block/" + name));

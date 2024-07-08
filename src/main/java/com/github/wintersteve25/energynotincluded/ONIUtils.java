@@ -1,9 +1,11 @@
 package com.github.wintersteve25.energynotincluded;
 
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
+import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registries.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,8 +34,8 @@ public class ONIUtils {
                     output.accept(i.get());
                 }
 
-                for (ONIBlockDeferredRegister.DeferredBlock<?, ?> b : ONIBlocks.BLOCKS.getAllBlocks().keySet()) {
-                    output.accept(b.blockItem().get());
+                for (Tuple<ONIBlockDeferredRegister.DeferredBlock<?, ?>, ONIBlockRegistryData> b : ONIBlocks.BLOCKS.getAllBlocks()) {
+                    output.accept(b.getA().blockItem().get());
                 }
             })
             .build());
