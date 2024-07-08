@@ -3,27 +3,29 @@ package com.github.wintersteve25.energynotincluded.common.contents.base.blocks.p
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseInvTE;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.recipes.blueprints.BlueprintRecipe;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
-import com.github.wintersteve25.energynotincluded.common.utils.PartialItemIngredient;
+import com.github.wintersteve25.energynotincluded.common.contents.modules.recipes.CountedIngredient;
+import com.github.wintersteve25.energynotincluded.common.utils.SerializableMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ONIPlaceHolderTE extends ONIBaseInvTE {
 
-    private BlueprintRecipe recipe;
-    private List<PartialItemIngredient> remainingIngredients;
+    private RecipeHolder<BlueprintRecipe> recipe;
+    private SerializableMap<CountedIngredient, Integer> remainingIngredients;
     private float completionPercentage;
 
     public ONIPlaceHolderTE(BlockPos pos, BlockState state) {
-        this(ONIBlocks.Misc.PLACEHOLDER_TE.get(), pos, state);
+        this(ONIBlocks.PLACEHOLDER_TE.get(), pos, state);
     }
 
     public ONIPlaceHolderTE(BlockEntityType<ONIPlaceHolderTE> type, BlockPos pos, BlockState state) {
@@ -36,35 +38,52 @@ public class ONIPlaceHolderTE extends ONIBaseInvTE {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
         completionPercentage = tag.getFloat("completion");
         if (!tag.contains("recipe")) return;
         init(BlueprintRecipe.getRecipeWithId(level, new ResourceLocation(tag.getString("recipe"))).orElseThrow());
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.saveAdditional(tag, provider);
         tag.putFloat("completion", completionPercentage);
         if (recipe == null) return;
         tag.putString("recipe", recipe.id().toString());
     }
 
-    public void init(BlueprintRecipe recipe) {
+    public void init(RecipeHolder<BlueprintRecipe> recipe) {
         if (hasItem()) {
             throw new IllegalStateException("Should not initialize Placeholder with recipe after it is initialized and has items");
         }
 
         this.recipe = recipe;
-        this.remainingIngredients = new ArrayList<>(recipe.ingredients());
-        completionPercentage = remainingIngredients.size() == 0 ? 1 : 0f / remainingIngredients.size();
+        this.remainingIngredients = new SerializableMap<>(
+                ing -> NbtOps.INSTANCE.withEncoder(CountedIngredient.CODEC)
+                        .apply(ing)
+                        .getOrThrow(),
+                IntTag::valueOf,
+                tag -> NbtOps.INSTANCE.withDecoder(CountedIngredient.CODEC)
+                        .apply(tag)
+                        .getOrThrow()
+                        .getFirst(),
+                tag -> ((IntTag) tag).getAsInt(),
+                Tag.TAG_COMPOUND,
+                Tag.TAG_INT
+        );
+        
+        for (CountedIngredient ingredient : recipe.value().ingredients()) {
+            this.remainingIngredients.put(ingredient, ingredient.count());
+        }
+        completionPercentage = remainingIngredients.isEmpty() ? 1 : 0f / remainingIngredients.size();
     }
 
     public boolean addItem(ItemStack itemStack) {
         if (recipe == null) return false;
-        Optional<PartialItemIngredient> ingredient = remainingIngredients.stream()
-                .filter(ing -> ing.test(itemStack))
+        Optional<Map.Entry<CountedIngredient, Integer>> ingredient = remainingIngredients.entrySet()
+                .stream()
+                .filter(ing -> ing.getKey().test(itemStack))
                 .findFirst();
 
         if (ingredient.isEmpty()) return false;
@@ -75,12 +94,13 @@ public class ONIPlaceHolderTE extends ONIBaseInvTE {
 
             itemHandler.insertItem(i, itemStack.copy(), false);
 
-            int shrinkCount = Math.min(itemStack.getCount(), ingredient.get().getCount());
+            int currCount = ingredient.get().getValue();
+            int shrinkCount = Math.min(itemStack.getCount(), currCount);
             itemStack.shrink(shrinkCount);
-
-            ingredient.get().shrink(shrinkCount);
-            if (ingredient.get().getCount() <= 0) {
-                remainingIngredients.remove(ingredient.get());
+            
+            this.remainingIngredients.put(ingredient.get().getKey(), currCount - shrinkCount);
+            if (currCount - shrinkCount <= 0) {
+                remainingIngredients.remove(ingredient.get().getKey());
             }
 
             completionPercentage = 0f / remainingIngredients.size();
@@ -96,7 +116,7 @@ public class ONIPlaceHolderTE extends ONIBaseInvTE {
             return null;
         }
 
-        return recipe.output();
+        return recipe.value().output();
     }
 
     public float getCompletionPercentage() {

@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -104,7 +105,7 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
 
     @Nonnull
     @Override
-    public ItemStack getCloneItemStack(@Nonnull BlockState state, HitResult target, @Nonnull BlockGetter world, @Nonnull BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(@Nonnull BlockState state, HitResult target, @Nonnull LevelReader world, @Nonnull BlockPos pos, Player player) {
         BlockPos mainPos = getMainBlockPos(world, pos);
         if (mainPos == null) {
             return ItemStack.EMPTY;
@@ -112,8 +113,6 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
         BlockState mainState = world.getBlockState(mainPos);
         return mainState.getBlock().getCloneItemStack(mainState, target, world, mainPos, player);
     }
-
-
 
     @Override
     public boolean onDestroyedByPlayer(@Nonnull BlockState state, Level world, @Nonnull BlockPos pos, @Nonnull Player player, boolean willHarvest, FluidState fluidState) {
@@ -220,16 +219,6 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
         }
     }
 
-//    @Override
-//    public boolean triggerEvent(BlockState pState, Level pLevel, BlockPos pPos, int pId, int pParam) {
-//        ONIBaseTE te = WorldUtils.getTileEntity(ONIBoundingTE.class, pLevel, pPos);
-//        if (te != null) {
-//            super.triggerEvent(pState, pLevel, pPos, pId, pParam);
-//            return te.onTriggerBlockEntityEvent(pState, pLevel, pPos, pId, pParam);
-//        }
-//        return super.triggerEvent(pState, pLevel, pPos, pId, pParam);
-//    }
-
     @Override
     protected boolean isPathfindable(BlockState pState, PathComputationType pPathComputationType) {
         return false;
@@ -237,6 +226,6 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return ONIBlocks.Misc.BOUNDING_TE.get().create(pPos, pState);
+        return ONIBlocks.BOUNDING_TE.get().create(pPos, pState);
     }
 }

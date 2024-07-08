@@ -1,8 +1,10 @@
 package com.github.wintersteve25.energynotincluded.common.utils;
 
+import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal.CoalGenTE;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -13,7 +15,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base.GeckolibModelBase;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseAnimatedBlockItem;
-import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal.CoalGenTE;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.function.Supplier;
 
@@ -21,10 +25,10 @@ public final class ONIConstants {
     public static final class Geo {
         public static final GeckolibModelBase<CoalGenTE> COAL_GEN_TE = new GeckolibModelBase<>("machines/power/coal_generator.geo.json", "machines/power/coal_generator.png", "machines/power/coal_generator.animation.json");
         public static final GeckolibModelBase<ONIBaseAnimatedBlockItem> COAL_GEN_IB = new GeckolibModelBase<>(COAL_GEN_TE);
-        public static final Supplier<BlockEntityWithoutLevelRenderer> COAL_GEN_ISTER = () ->new GeoItemRendererDefault<>(COAL_GEN_IB);
+        public static final Supplier<BlockEntityWithoutLevelRenderer> COAL_GEN_ISTER = () -> new GeoItemRendererDefault<>(COAL_GEN_IB);
 
-        private static class GeoItemRendererDefault<T extends Item & IAnimatable> extends GeoItemRenderer<T> {
-            public GeoItemRendererDefault(AnimatedGeoModel<T> modelProvider) {
+        private static class GeoItemRendererDefault<T extends Item & GeoAnimatable> extends GeoItemRenderer<T> {
+            public GeoItemRendererDefault(GeoModel<T> modelProvider) {
                 super(modelProvider);
             }
         }
@@ -67,7 +71,6 @@ public final class ONIConstants {
         public static final TextureElement POWER_BAR_BG = new TextureElement(0, 101, 18, 50);
 
         public static final ResourceLocation BLANK_GUI = new ResourceLocation(ONIUtils.MODID, "textures/gui/machines/blank_gui.png");
-
         public static final ResourceLocation CURIOS_GOGGLES = new ResourceLocation(ONIUtils.MODID, "gui/misc/curios/goggles");
     }
 
@@ -87,42 +90,58 @@ public final class ONIConstants {
     }
 
     public static final class PlacementConditions {
+        private static boolean isValidReplaceableBlock(Level level, BlockPlaceContext context, BlockPos pos) {
+            if (!isBlockLoaded(level, pos)) {
+                return false;
+            }
+            
+            return level.getBlockState(pos).canBeReplaced(context);
+        }
+
+        private static boolean isBlockLoaded(Level level, BlockPos pos) {
+            if (level == null) return false;
+            if (!level.isInWorldBounds(pos)) {
+                return false;
+            }
+            return level.hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+        }
+
         public static boolean fourByFourCondition(BlockPlaceContext context, BlockState state) {
             Level world = context.getLevel();
             BlockPos ogPos = context.getClickedPos();
 
             switch (state.getValue(BlockStateProperties.FACING)) {
                 case NORTH:
-                    if (WorldUtils.isValidReplaceableBlock(world, ogPos.east())) {
-                        if (WorldUtils.isValidReplaceableBlock(world, ogPos.above())) {
-                            if (WorldUtils.isValidReplaceableBlock(world, ogPos.east().above())) {
+                    if (isValidReplaceableBlock(world, context, ogPos.east())) {
+                        if (isValidReplaceableBlock(world, context, ogPos.above())) {
+                            if (isValidReplaceableBlock(world, context, ogPos.east().above())) {
                                 return true;
                             }
                         }
                     }
                     break;
                 case SOUTH:
-                    if (WorldUtils.isValidReplaceableBlock(world, ogPos.west())) {
-                        if (WorldUtils.isValidReplaceableBlock(world, ogPos.above())) {
-                            if (WorldUtils.isValidReplaceableBlock(world, ogPos.west().above())) {
+                    if (isValidReplaceableBlock(world, context, ogPos.west())) {
+                        if (isValidReplaceableBlock(world, context, ogPos.above())) {
+                            if (isValidReplaceableBlock(world, context, ogPos.west().above())) {
                                 return true;
                             }
                         }
                     }
                     break;
                 case WEST:
-                    if (WorldUtils.isValidReplaceableBlock(world, ogPos.north())) {
-                        if (WorldUtils.isValidReplaceableBlock(world, ogPos.above())) {
-                            if (WorldUtils.isValidReplaceableBlock(world, ogPos.north().above())) {
+                    if (isValidReplaceableBlock(world, context, ogPos.north())) {
+                        if (isValidReplaceableBlock(world, context, ogPos.above())) {
+                            if (isValidReplaceableBlock(world, context, ogPos.north().above())) {
                                 return true;
                             }
                         }
                     }
                     break;
                 case EAST:
-                    if (WorldUtils.isValidReplaceableBlock(world, ogPos.south())) {
-                        if (WorldUtils.isValidReplaceableBlock(world, ogPos.above())) {
-                            if (WorldUtils.isValidReplaceableBlock(world, ogPos.south().above())) {
+                    if (isValidReplaceableBlock(world, context, ogPos.south())) {
+                        if (isValidReplaceableBlock(world, context, ogPos.above())) {
+                            if (isValidReplaceableBlock(world, context, ogPos.south().above())) {
                                 return true;
                             }
                         }

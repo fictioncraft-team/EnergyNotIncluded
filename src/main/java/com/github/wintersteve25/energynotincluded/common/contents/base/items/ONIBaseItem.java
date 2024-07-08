@@ -39,8 +39,8 @@ public class ONIBaseItem extends Item implements ONIIItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltip(stack, context, tooltipComponents, tooltipFlag);
     }
 
     @Override
@@ -55,9 +55,7 @@ public class ONIBaseItem extends Item implements ONIIItem {
     @Override
     public boolean mineBlock(ItemStack pStack, Level pLevel, BlockState pState, BlockPos pPos, LivingEntity pEntityLiving) {
         if (!pLevel.isClientSide && pState.getDestroySpeed(pLevel, pPos) != 0.0F && takeDurabilityDamage) {
-            pStack.hurtAndBreak(1, pEntityLiving, (p_40992_) -> {
-                p_40992_.broadcastBreakEvent(EquipmentSlot.MAINHAND);
-            });
+            pStack.hurtAndBreak(1, pEntityLiving, EquipmentSlot.MAINHAND);
         }
 
         return true;

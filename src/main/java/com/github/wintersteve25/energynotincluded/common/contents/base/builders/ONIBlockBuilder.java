@@ -17,6 +17,7 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.interface
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseAnimatedBlockItem;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseItemBlock;
 
+import javax.annotation.Nullable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -37,18 +38,18 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
     private LootTableDrop lootTableDrop = LootTableDrop.dropSelf();
 
     public ONIBlockBuilder(String regName, Supplier<T> block) {
-        this(regName, block, null, false);
+        this(regName, block, null);
     }
 
-    public ONIBlockBuilder(String regName, Supplier<T> block, Supplier<BlockEntityWithoutLevelRenderer> ister, boolean isAnimated) {
-        this(regName, block, ONIUtils.defaultProperties(), ister, isAnimated);
+    public ONIBlockBuilder(String regName, Supplier<T> block, @Nullable Supplier<BlockEntityWithoutLevelRenderer> ister) {
+        this(regName, block, ONIUtils.defaultProperties(), ister);
     }
 
-    public ONIBlockBuilder(String regName, Supplier<T> block, Item.Properties properties, Supplier<BlockEntityWithoutLevelRenderer> ister, boolean isAnimated) {
+    public ONIBlockBuilder(String regName, Supplier<T> block, Item.Properties properties, @Nullable Supplier<BlockEntityWithoutLevelRenderer> ister) {
         this.block = block;
         this.regName = regName;
-        if (isAnimated) {
-            this.blockItem = new ONIItemBuilder<>(this.regName, (b) -> new ONIBaseAnimatedBlockItem(b, ister, properties));
+        if (ister != null) {
+            this.blockItem = new ONIItemBuilder<>(this.regName, (b) -> new ONIBaseAnimatedBlockItem(b, properties, ister));
         } else {
             this.blockItem = new ONIItemBuilder<>(this.regName, (b) -> new ONIBaseItemBlock(b, properties));
         }

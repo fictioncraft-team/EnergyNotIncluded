@@ -1,7 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.datagen.client;
 
 import com.github.wintersteve25.energynotincluded.ONIUtils;
-import com.github.wintersteve25.energynotincluded.client.gui.ONIBaseGuiTab;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registration.item.ONIItemRegistryData;
@@ -88,10 +87,6 @@ public class ONIEngLangProvider extends LanguageProvider {
         add("oniutils.gui.warning.gasPressure", "High Gas Pressure!");
         add("oniutils.gui.warning.wrongGas", "Wrong Gas Input!");
         add("oniutils.gui.warning.allClear", "All Clear");
-
-        add(ONIBaseGuiTab.REDSTONE_LOW, "Low Threshold: %s");
-        add(ONIBaseGuiTab.REDSTONE_HIGH, "High Threshold: %s");
-        add(ONIBaseGuiTab.REDSTONE_INVALID_NUMBER, "Invalid Number!");
 
         add("oniutils.gui.items.modification.bonus", "Modification Value: %s");
 

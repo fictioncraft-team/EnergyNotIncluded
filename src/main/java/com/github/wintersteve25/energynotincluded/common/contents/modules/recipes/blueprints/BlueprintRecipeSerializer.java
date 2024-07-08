@@ -1,69 +1,28 @@
 package com.github.wintersteve25.energynotincluded.common.contents.modules.recipes.blueprints;
 
-import com.github.wintersteve25.energynotincluded.common.utils.PartialItemIngredient;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import org.jetbrains.annotations.Nullable;
 
-public class BlueprintRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<BlueprintRecipe> {
-
-    /**
-     * EXAMPLE JSON
-     * {
-     *     "inputs": [
-     *          {
-     *              "item": "minecraft:iron_ingot",
-     *              "count": 5
-     *          }
-     *     ],
-     *     "output": "oniutils:coal_generator"
-     * }
-     */
+public enum BlueprintRecipeSerializer implements RecipeSerializer<BlueprintRecipe> {
+    INSTANCE;
 
     @Override
-    public BlueprintRecipe fromJson(ResourceLocation pRecipeId, JsonObject json) {
-        JsonArray inputs = json.getAsJsonArray("inputs");
-
-        if (inputs.size() > 32) {
-            throw new IllegalStateException("Blueprint recipes can not have more than 32 ingredients");
-        }
-
-        NonNullList<PartialItemIngredient> ingredients = NonNullList.create();
-
-        for (JsonElement input : inputs) {
-            ingredients.add(PartialItemIngredient.parse(input));
-        }
-
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(json.get("output").getAsString()));
-
-        if (item instanceof BlockItem blockItem) {
-            return new BlueprintRecipe(pRecipeId, ingredients, blockItem);
-        }
-
-        throw new IllegalArgumentException("Blueprint output must be a blockitem");
-    }
-
-    @Nullable
-    @Override
-    public BlueprintRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
-        NonNullList<PartialItemIngredient> ings = pBuffer.readCollection(c -> NonNullList.create(), PartialItemIngredient::decode);
-        BlockItem output = (BlockItem) pBuffer.readItem().getItem();
-        return new BlueprintRecipe(pRecipeId, ings, output);
+    public MapCodec<BlueprintRecipe> codec() {
+        return BlueprintRecipe.MAP_CODEC;
     }
 
     @Override
-    public void toNetwork(FriendlyByteBuf pBuffer, BlueprintRecipe pRecipe) {
-        pBuffer.writeCollection(pRecipe.ingredients(), (buf, ing) -> ing.encode(buf));
-        pBuffer.writeItem(new ItemStack(pRecipe.output()));
+    public StreamCodec<RegistryFriendlyByteBuf, BlueprintRecipe> streamCodec() {
+        return StreamCodec.of(this::toNetwork, this::fromNetwork);
+    }
+
+    private BlueprintRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
+        return buf.readJsonWithCodec(BlueprintRecipe.MAP_CODEC.codec());
+    }
+
+    private void toNetwork(RegistryFriendlyByteBuf buf, BlueprintRecipe recipe) {
+        buf.writeJsonWithCodec(BlueprintRecipe.MAP_CODEC.codec(), recipe);
     }
 }

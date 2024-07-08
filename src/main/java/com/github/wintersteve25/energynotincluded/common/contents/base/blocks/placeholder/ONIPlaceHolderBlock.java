@@ -2,36 +2,31 @@ package com.github.wintersteve25.energynotincluded.common.contents.base.blocks.p
 
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseDirectional;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
-import mekanism.common.util.WorldUtils;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlock {
     public ONIPlaceHolderBlock() {
-        this(Properties.of(Material.METAL).strength(-3.5F, 3600000.0F).requiresCorrectToolForDrops().dynamicShape().noOcclusion());
+        this(Properties.of().strength(-3.5F, 3600000.0F).requiresCorrectToolForDrops().dynamicShape().noOcclusion());
     }
 
     public ONIPlaceHolderBlock(Properties properties) {
@@ -41,7 +36,7 @@ public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlo
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return ONIBlocks.Misc.PLACEHOLDER_TE.get().create(pPos, pState);
+        return ONIBlocks.PLACEHOLDER_TE.get().create(pPos, pState);
     }
 
     @Override
@@ -51,22 +46,22 @@ public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlo
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        ItemStack heldItem = pPlayer.getItemInHand(pHand);
-        if (heldItem.isEmpty()) return InteractionResult.PASS;
-        ONIPlaceHolderTE te = getTileEntityOrThrow(ONIPlaceHolderTE.class, pLevel, pPos);
-        return te.addItem(heldItem) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (heldItem.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        ONIPlaceHolderTE te = getTileEntityOrThrow(ONIPlaceHolderTE.class, level, pos);
+        return te.addItem(heldItem) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         ONIPlaceHolderTE te = getTileEntityOrThrow(ONIPlaceHolderTE.class, pLevel, pPos);
-        pLevel.getServer().getPlayerList().broadcastMessage(new TranslatableComponent("oniutils.message.requests.buildCanceled", te.getInPlaceOf().getBlock().getName()), ChatType.GAME_INFO, Util.NIL_UUID);
+        pLevel.getServer().getPlayerList().broadcastSystemMessage(Component.translatable("oniutils.message.requests.buildCanceled", te.getInPlaceOf().getBlock().getName()), true);
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         ONIPlaceHolderTE te = getTileEntityOrThrow(ONIPlaceHolderTE.class, level, pos);
 
         if (te.getInPlaceOf() == null) {
@@ -78,9 +73,9 @@ public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlo
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-        ONIPlaceHolderTE te = WorldUtils.getTileEntity(ONIPlaceHolderTE.class, worldIn, pos);
+        BlockEntity be = worldIn.getBlockEntity(pos);
 
-        if (te == null) {
+        if (!(be instanceof ONIPlaceHolderTE te)) {
             return super.getShape(state, worldIn, pos, context);
         }
 
@@ -90,20 +85,11 @@ public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlo
             return super.getShape(state, worldIn, pos, context);
         }
 
-        return item.getBlock().getShape(state, worldIn, pos, context);
+        return item.getBlock().defaultBlockState().getShape(worldIn, pos, context);
     }
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
-    }
-
-    @Override
-    public boolean isPathfindable(BlockState pState, BlockGetter pLevel, BlockPos pPos, PathComputationType pType) {
-        return false;
-    }
-
-    @Override
-    public void fillItemCategory(CreativeModeTab pTab, NonNullList<ItemStack> pItems) {
     }
 }

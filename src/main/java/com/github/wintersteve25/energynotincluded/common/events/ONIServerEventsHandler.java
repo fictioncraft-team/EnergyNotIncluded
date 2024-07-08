@@ -4,7 +4,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
-import com.github.wintersteve25.energynotincluded.common.commands.SetGermAmountCommands;
 import com.github.wintersteve25.energynotincluded.common.commands.SimpleCommands;
 import com.github.wintersteve25.energynotincluded.common.network.ONINetworking;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -26,14 +25,8 @@ public class ONIServerEventsHandler {
 
         ONIUtils.LOGGER.info("Registering ONIUtils Commands");
 
-        dispatcher.register(Commands.literal("oniutils")
+        dispatcher.register(Commands.literal(ONIUtils.MODID)
                 .requires((commandSource) -> commandSource.hasPermission(1))
-                .then(Commands.literal("germs")
-                        .then(SetGermAmountCommands.register(dispatcher))
-                        .then(SimpleCommands.getGermCommand()))
-                .then(Commands.literal("skills")
-                        .then(SimpleCommands.setSkillLevelCommand())
-                        .then(SimpleCommands.getSkillLevelCommand()))
                 .then(Commands.literal("debug")
                         .then(SimpleCommands.teleportDimensionCommand())));
     }

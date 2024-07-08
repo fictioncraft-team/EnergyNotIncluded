@@ -7,10 +7,15 @@ import com.github.wintersteve25.energynotincluded.common.contents.modules.recipe
 import com.github.wintersteve25.energynotincluded.common.network.ONINetworking;
 import com.github.wintersteve25.energynotincluded.common.network.PacketOpenUI;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
-import com.github.wintersteve25.energynotincluded.common.registries.ONIGui;
+import com.github.wintersteve25.energynotincluded.common.registries.ONIDataComponents;
+import com.github.wintersteve25.energynotincluded.common.registries.ONIScreens;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,6 +33,17 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class ONIBlueprintItem extends ONIBaseItem {
+    
+    public static final Codec<ItemData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            ResourceLocation.CODEC
+                    .fieldOf("recipe")
+                    .forGetter(ItemData::recipeSelected)
+    ).apply(instance, ItemData::new));
+    
+    public static final StreamCodec<ByteBuf, ItemData> STREAM_CODEC = StreamCodec.composite(
+            ResourceLocation.STREAM_CODEC, ItemData::recipeSelected,
+            ItemData::new
+    );
 
     public ONIBlueprintItem() {
         super(ONIUtils.defaultProperties());
@@ -43,14 +59,14 @@ public class ONIBlueprintItem extends ONIBaseItem {
         Level level = pContext.getLevel();
         if (!level.isInWorldBounds(targetPosition)) return InteractionResult.PASS;
 
-        BlockItem placeHolder = ONIBlocks.Misc.PLACEHOLDER_BLOCK.asItem();
+        BlockItem placeHolder = ONIBlocks.PLACEHOLDER_BLOCK.blockItem().get();
         InteractionResult result = placeHolder.place(new BlockPlaceContext(level, player, pContext.getHand(), ItemStack.EMPTY, new BlockHitResult(pContext.getClickLocation(), face, targetPosition, false)));
 
         if (!result.consumesAction()) return InteractionResult.PASS;
         if (level instanceof ServerLevel serverLevel) {
             BlockEntity blockEntity = serverLevel.getBlockEntity(targetPosition);
             if (blockEntity instanceof ONIPlaceHolderTE placeHolderTE) {
-                placeHolderTE.init(getRecipe(player));
+                placeHolderTE.init(BlueprintRecipe.getRecipeWithId(level, pContext.getItemInHand().get(ONIDataComponents.BLUEPRINT_ITEM_DATA.get()).recipeSelected()).orElseThrow());
                 placeHolderTE.updateBlock();
             }
         }
@@ -67,21 +83,15 @@ public class ONIBlueprintItem extends ONIBaseItem {
         }
 
         if (pPlayer.isCrouching() && pPlayer.pick(5, 0, false).getType() == HitResult.Type.MISS) {
-            ONINetworking.sendToClient(new PacketOpenUI(ONIGui.BLUEPRINT), (ServerPlayer) pPlayer);
+            ONINetworking.sendToClient(new PacketOpenUI(ONIScreens.BLUEPRINT), (ServerPlayer) pPlayer);
             return InteractionResultHolder.success(itemstack);
         }
 
         return InteractionResultHolder.pass(itemstack);
     }
-
-    public static void setRecipe(ServerPlayer player, ResourceLocation recipeRl) {
-        CompoundTag tag = player.getMainHandItem().getOrCreateTag();
-        tag.putString("recipe", recipeRl.toString());
-    }
-
-    private static BlueprintRecipe getRecipe(Player player) {
-        CompoundTag tag = player.getMainHandItem().getOrCreateTag();
-        ResourceLocation recipeRL = new ResourceLocation(tag.getString("recipe"));
-        return BlueprintRecipe.getRecipeWithId(player.getLevel(), recipeRL).orElseThrow();
+    
+    public static record ItemData(
+            ResourceLocation recipeSelected
+    ) {
     }
 }

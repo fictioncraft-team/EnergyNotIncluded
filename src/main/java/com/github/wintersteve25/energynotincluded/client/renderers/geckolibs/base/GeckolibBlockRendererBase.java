@@ -1,14 +1,13 @@
 package com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base;
 
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
-import software.bernie.geckolib3.renderers.geo.GeoBlockRenderer;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoBlockRenderer;
 
-public class GeckolibBlockRendererBase<T extends BlockEntity & IAnimatable> extends GeoBlockRenderer<T> {
-    public GeckolibBlockRendererBase(BlockEntityRendererProvider.Context rendererDispatcherIn, AnimatedGeoModel<T> modelProvider) {
-        super(rendererDispatcherIn, modelProvider);
+public class GeckolibBlockRendererBase<T extends BlockEntity & GeoBlockEntity> extends GeoBlockRenderer<T> {
+    public GeckolibBlockRendererBase(GeoModel<T> modelProvider) {
+        super(modelProvider);
     }
 
 //    @Override

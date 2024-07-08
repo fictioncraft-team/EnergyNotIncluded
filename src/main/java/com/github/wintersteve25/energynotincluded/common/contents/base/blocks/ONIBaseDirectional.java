@@ -78,27 +78,31 @@ public class ONIBaseDirectional extends ONIBaseBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (autoRotateShape && getHitBox() != null) {
-            int yrot = switch (state.getValue(FACING)) {
-                case SOUTH -> 180;
-                case WEST -> 90;
-                case EAST -> -90;
-                default -> 0;
+            Rotation yrot = switch (state.getValue(FACING)) {
+                case SOUTH -> Rotation.CLOCKWISE_180;
+                case WEST -> Rotation.COUNTERCLOCKWISE_90;
+                case EAST -> Rotation.CLOCKWISE_90;
+                default -> Rotation.NONE;
             };
 
             VoxelShape shape = super.getShape(state, worldIn, pos, context);
 
-            if (yrot != 0) {
-                shape = MiscHelper.rotateShape(shape, yrot, new Vector3d(0, 1, 0));
+            if (yrot != Rotation.NONE) {
+                shape = MiscHelper.rotate(shape, yrot);
             }
 
             if (allowVertical) {
-                int xrot = switch (state.getValue(FACING)) {
-                    case UP -> 90;
-                    case DOWN -> -90;
-                    default -> 0;
+                Direction xrot = switch (state.getValue(FACING)) {
+                    case UP -> Direction.UP;
+                    case DOWN -> Direction.DOWN;
+                    default -> null;
                 };
+                
+                if (xrot == null) {
+                    return shape;
+                }
 
-                shape = MiscHelper.rotateShape(shape, xrot, new Vector3d(1, 0, 0));
+                shape = MiscHelper.rotateHorizontal(shape, xrot);
             }
 
             return shape;

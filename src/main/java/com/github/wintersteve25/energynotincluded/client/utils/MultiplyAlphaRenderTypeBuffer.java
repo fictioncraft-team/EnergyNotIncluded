@@ -1,30 +1,24 @@
 package com.github.wintersteve25.energynotincluded.client.utils;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import org.joml.Matrix4f;
 
 // Copied from Building Gadgets source code, credits to the folks working on that project, thanks a lot
 // https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/src/main/java/com/direwolf20/buildinggadgets/client/renderer/OurRenderTypes.java#L122
-public class ColoredRenderTypeBuffer implements MultiBufferSource {
+public class MultiplyAlphaRenderTypeBuffer implements MultiBufferSource {
     private final MultiBufferSource inner;
-    private final float alphaMultiplier;
-    private final float rMultiplier;
-    private final float gMultiplier;
-    private final float bMultiplier;
+    private final float constantAlpha;
 
-    public ColoredRenderTypeBuffer(MultiBufferSource inner, float alphMultiplier, float rMultiplier, float gMultiplier, float bMultiplier) {
+    public MultiplyAlphaRenderTypeBuffer(MultiBufferSource inner, float constantAlpha) {
         this.inner = inner;
-        this.alphaMultiplier = alphMultiplier;
-        this.rMultiplier = rMultiplier;
-        this.gMultiplier = gMultiplier;
-        this.bMultiplier = bMultiplier;
+        this.constantAlpha = constantAlpha;
     }
 
     @Override
@@ -32,31 +26,27 @@ public class ColoredRenderTypeBuffer implements MultiBufferSource {
         RenderType localType = type;
         if (localType instanceof RenderType.CompositeRenderType) {
             // all of this requires a lot of AT's so be aware of that on ports
-            ResourceLocation texture = ((RenderStateShard.TextureStateShard) ((RenderType.CompositeRenderType) localType).state.textureState).texture.orElse(InventoryMenu.BLOCK_ATLAS);
+            ResourceLocation texture = ((RenderStateShard.TextureStateShard) ((RenderType.CompositeRenderType) localType).state.textureState).texture
+                    .orElse(InventoryMenu.BLOCK_ATLAS);
+
             localType = RenderType.entityTranslucentCull(texture);
         } else if (localType.toString().equals(Sheets.translucentCullBlockSheet().toString())) {
             localType = Sheets.translucentCullBlockSheet();
         }
 
-        return new ColoredVertexBuffer(this.inner.getBuffer(localType), this.alphaMultiplier, rMultiplier, gMultiplier, bMultiplier);
+        return new MultiplyAlphaVertexBuilder(this.inner.getBuffer(localType), this.constantAlpha);
     }
 
     /**
      * Required for modifying the alpha value.
      */
-    public static class ColoredVertexBuffer implements VertexConsumer {
+    public static class MultiplyAlphaVertexBuilder implements VertexConsumer {
         private final VertexConsumer inner;
-        private final float alphaMultiplier;
-        private final float rMultiplier;
-        private final float gMultiplier;
-        private final float bMultiplier;
+        private final float constantAlpha;
 
-        public ColoredVertexBuffer(VertexConsumer inner, float alphaMultiplier, float rMultiplier, float gMultiplier, float bMultiplier) {
+        public MultiplyAlphaVertexBuilder(VertexConsumer inner, float constantAlpha) {
             this.inner = inner;
-            this.alphaMultiplier = alphaMultiplier;
-            this.rMultiplier = rMultiplier;
-            this.gMultiplier = gMultiplier;
-            this.bMultiplier = bMultiplier;
+            this.constantAlpha = constantAlpha;
         }
 
         @Override
@@ -71,7 +61,7 @@ public class ColoredRenderTypeBuffer implements MultiBufferSource {
 
         @Override
         public VertexConsumer color(int red, int green, int blue, int alpha) {
-            return inner.color((int) (red * rMultiplier), (int) (green * gMultiplier), (int) (blue * bMultiplier), (int) (alpha * alphaMultiplier));
+            return inner.color(red, green, blue, (int) (alpha * constantAlpha));
         }
 
         @Override
@@ -96,7 +86,7 @@ public class ColoredRenderTypeBuffer implements MultiBufferSource {
         }
 
         @Override
-        public VertexConsumer normal(Matrix3f matrixIn, float x, float y, float z) {
+        public VertexConsumer normal(PoseStack.Pose matrixIn, float x, float y, float z) {
             return inner.normal(matrixIn, x, y, z);
         }
 

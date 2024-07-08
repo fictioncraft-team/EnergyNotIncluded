@@ -39,8 +39,8 @@ public class ONIBaseItemBlock extends BlockItem implements ONIIItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable TooltipContext ctx, List<Component> tooltip, TooltipFlag flagIn) {
+        tooltip(stack, ctx, tooltip, flagIn);
     }
 
     @Override

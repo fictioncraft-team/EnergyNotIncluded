@@ -1,131 +1,90 @@
 package com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal;
 
 import com.github.wintersteve25.energynotincluded.common.contents.base.ONIItemCategory;
-import com.google.common.collect.Lists;
-import mekanism.common.util.VoxelShapeUtils;
+import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseMachine;
+import com.github.wintersteve25.energynotincluded.common.registries.ONICapabilities;
+import com.github.wintersteve25.energynotincluded.common.registries.ONIMenus;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import org.joml.Vector3d;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.*;
 import com.github.wintersteve25.energynotincluded.common.data.plasma.api.EnumPlasmaTileType;
-import com.github.wintersteve25.energynotincluded.common.data.plasma.api.IPlasma;
 import com.github.wintersteve25.energynotincluded.common.data.plasma.api.Plasma;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseInvTE;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIBlockBuilder;
-import com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIContainerBuilder;
-import com.github.wintersteve25.energynotincluded.common.contents.base.enums.EnumModifications;
-import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ModificationContext;
-import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ModificationHandler;
-import com.github.wintersteve25.energynotincluded.common.data.capabilities.player_data.api.SkillType;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
-import com.github.wintersteve25.energynotincluded.common.registries.ONICapabilities;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIConfig;
 import com.github.wintersteve25.energynotincluded.common.utils.ONIConstants;
-import com.github.wintersteve25.energynotincluded.common.utils.SlotArrangement;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.LangHelper;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
 import java.util.function.BiPredicate;
 
 import static com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper.ONEPIXEL;
 
-public class CoalGenTE extends ONIBaseInvTE implements IAnimatable, ONIITickableServer, ONIIBoundingBlock, ONIIHasProgress, ONIIForceStoppable, ONIIHasRedstoneOutput, ONIIHasValidItems, ONIIMachine, ONIIRequireSkillToInteract {
+public class CoalGenTE extends ONIBaseInvTE implements ONIITickableServer, ONIIBoundingBlock, ONIIHasValidItems, GeoBlockEntity {
 
-    public final ModificationContext modificationContext = new ModificationContext(this, 9, EnumModifications.SPEED, EnumModifications.TEMPERATURE, EnumModifications.COMPLEXITY);
-    private final ModificationHandler modificationHandler = new ModificationHandler(modificationContext);
-    private final AnimationFactory manager = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final Plasma plasmaHandler = new Plasma(4000, EnumPlasmaTileType.PRODUCER);
-    private final LazyOptional<IPlasma> powerLazyOptional = LazyOptional.of(() -> plasmaHandler);
     private boolean removedFirstItem = false;
 
     private int progress = 0;
-    private int totalProgress = ONIConfig.Server.COAL_GEN_PROCESS_TIME.get();
-    private boolean isForceStopped = false;
-    private boolean isInverted = false;
-    private boolean isWorking = false;
-
-    private int lowThreshold = 20;
-    private int highThreshold = 80;
+    private final int totalProgress = ONIConfig.Server.COALGEN_PROCESS_TIME.getAsInt();
 
     public CoalGenTE(BlockPos pos, BlockState state) {
-        super(ONIBlocks.Machines.Power.COAL_GEN_TE.get(), pos, state);
+        super(ONIBlocks.COAL_GEN_TE.get(), pos, state);
     }
-    
+
     @Override
-    public void serverTick() {
+    public void serverTick(Level level, BlockPos pos, BlockState state) {
         if (getLevel() != null) {
-            if (getForceStopped()) {
-                setWorking(false);
-            }
+            int plasmaEachTick = 10;
 
-            int plasmaEachTick = producingPower();
-
-            if (!getForceStopped()) {
-                if (progress > 0) {
-                    int progressSpeed = modificationHandler.getProgressSpeed();
-                    if (plasmaHandler.canGenerate(plasmaEachTick)) {
-                        if (!removedFirstItem) {
-                            itemHandler.extractItem(0, 1, false);
-                            removedFirstItem = true;
-                        }
-                        progress -= progressSpeed;
-                        plasmaHandler.addPower(plasmaEachTick);
-                        setWorking(true);
-                        if (progress <= 0) {
-                            removedFirstItem = false;
-                            setWorking(false);
-                            progress = 0;
-                        }
+            if (progress > 0) {
+                if (plasmaHandler.canGenerate(plasmaEachTick)) {
+                    if (!removedFirstItem) {
+                        itemHandler.extractItem(0, 1, false);
+                        removedFirstItem = true;
                     }
-                } else {
-                    if (plasmaHandler.canGenerate(plasmaEachTick)) {
-                        if (!itemHandler.getStackInSlot(0).isEmpty()) {
-                            progress = getTotalProgress();
-                            setWorking(true);
-                        } else {
-                            setWorking(false);
-                            progress = 0;
-                        }
+                    progress -= 1;
+                    plasmaHandler.addPower(plasmaEachTick);
+                    if (progress <= 0) {
+                        removedFirstItem = false;
+                        progress = 0;
+                    }
+                }
+            } else {
+                if (plasmaHandler.canGenerate(plasmaEachTick)) {
+                    if (!itemHandler.getStackInSlot(0).isEmpty()) {
+                        progress = totalProgress;
+                    } else {
+                        progress = 0;
                     }
                 }
             }
 
             if (!plasmaHandler.canGenerate(plasmaEachTick)) {
                 removedFirstItem = false;
-                setWorking(false);
                 progress = 0;
             }
 
@@ -134,17 +93,15 @@ public class CoalGenTE extends ONIBaseInvTE implements IAnimatable, ONIITickable
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        plasmaHandler.deserializeNBT(tag.getCompound("plasma"));
-        modificationContext.deserializeNBT(tag.getCompound("modifications"));
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
+        plasmaHandler.deserializeNBT(provider, tag.getCompound("plasma"));
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        tag.put("plasma", plasmaHandler.serializeNBT());
-        tag.put("modifications", modificationContext.serializeNBT());
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.saveAdditional(tag, provider);
+        tag.put("plasma", plasmaHandler.serializeNBT(provider));
     }
 
     @Override
@@ -157,41 +114,32 @@ public class CoalGenTE extends ONIBaseInvTE implements IAnimatable, ONIITickable
         return (stack, slot) -> stack.getItem() == Items.COAL;
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if (side != null) {
-                return itemLazyOptional.cast();
-            }
-            return modificationContext.getCombinedLazyOptional().cast();
-        }
-        if (cap == ONICapabilities.PLASMA) {
-            return powerLazyOptional.cast();
-        }
-
-        return super.getCapability(cap, side);
-    }
-
-    private <E extends BlockEntity & IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().transitionLengthTicks = 80;
-        if (getWorking()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.motor.new", ILoopType.EDefaultLoopTypes.LOOP));
+    private PlayState animationPredicate(AnimationState<CoalGenTE> state) {
+        AnimationController<CoalGenTE> controller = state.getController();
+        controller.transitionLength(80);
+        
+        if (progress > 0) {
+            controller.setAnimation(RawAnimation.begin().thenLoop("animation.motor.new"));
             return PlayState.CONTINUE;
         } else {
-            event.getController().setAnimation(new AnimationBuilder());
+            controller.setAnimation(RawAnimation.begin());
             return PlayState.STOP;
         }
     }
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, this::animationPredicate));
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return manager;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
+
+    @Override
+    public double getTick(Object object) {
+        return 0;
     }
 
     @Override
@@ -252,110 +200,6 @@ public class CoalGenTE extends ONIBaseInvTE implements IAnimatable, ONIITickable
         }
     }
 
-    @Override
-    public int getProgress() {
-        return progress;
-    }
-
-    @Override
-    public void setProgress(int progress) {
-        this.progress = progress;
-        updateBlock();
-    }
-
-    @Override
-    public int getTotalProgress() {
-        return totalProgress;
-    }
-
-    @Override
-    public void setTotalProgress(int progress) {
-        this.totalProgress = progress;
-        updateBlock();
-    }
-
-    @Override
-    public boolean getForceStopped() {
-        return isForceStopped;
-    }
-
-    @Override
-    public void setForceStopped(boolean forceStopped) {
-        this.isForceStopped = forceStopped;
-        updateBlock();
-    }
-
-    @Override
-    public boolean isInverted() {
-        return isInverted;
-    }
-
-    @Override
-    public void toggleInverted() {
-        isInverted = !isInverted;
-        updateBlock();
-    }
-
-    @Override
-    public boolean getWorking() {
-        return isWorking;
-    }
-
-    @Override
-    public void setWorking(boolean isWorking) {
-        this.isWorking = isWorking;
-        updateBlock();
-    }
-
-    @Override
-    public int lowThreshold() {
-        return lowThreshold;
-    }
-
-    @Override
-    public int highThreshold() {
-        return highThreshold;
-    }
-
-    @Override
-    public void setLowThreshold(int in) {
-        lowThreshold = in;
-        updateBlock();
-    }
-
-    @Override
-    public void setHighThreshold(int in) {
-        highThreshold = in;
-        updateBlock();
-    }
-
-    @Override
-    public ModificationContext modContext() {
-        return modificationContext;
-    }
-
-    @Override
-    public HashMap<SkillType, Integer> requiredSkill() {
-        HashMap<SkillType, Integer> map = new HashMap<>();
-        map.put(SkillType.MACHINERY, 4);
-        return map;
-    }
-
-    @Override
-    public ModificationHandler modHandler() {
-        return modificationHandler;
-    }
-
-    @Override
-    public List<MachineType> machineType() {
-        return Lists.newArrayList(MachineType.POWER_PRODUCER);
-    }
-
-    @Override
-    public int producingPower() {
-        return modificationHandler.getPlasmaOutputPerTick(getTotalProgress(), ONIConfig.Server.COAL_GEN_POWER_PRODUCE.get());
-    }
-
     private static final VoxelShape BOTTOM1 = Shapes.box(0D, 0, 0D, 1D, ONEPIXEL + (ONEPIXEL / 16) * 2, 1D);
     private static final VoxelShape BOTTOM2 = Shapes.box(1D, 0, 0D, 2D, ONEPIXEL + (ONEPIXEL / 16) * 2, 1D);
     private static final VoxelShape BOTTOM = Shapes.or(BOTTOM1, BOTTOM2);
@@ -363,41 +207,31 @@ public class CoalGenTE extends ONIBaseInvTE implements IAnimatable, ONIITickable
     private static final VoxelShape SUPPORT2 = Shapes.box(2D - ONEPIXEL * 3, ONEPIXEL + (ONEPIXEL / 16) * 2, ONEPIXEL * 6, 2D - ONEPIXEL * 1, 1 + ONEPIXEL * 10, ONEPIXEL * 11);
     private static final VoxelShape SUPPORT = Shapes.or(SUPPORT1, SUPPORT2);
     private static final VoxelShape MIDDLE = Shapes.box(ONEPIXEL * 6, ONEPIXEL * 6, ONEPIXEL * 4, 2D - ONEPIXEL * 3, 1 + ONEPIXEL * 9, 1D - ONEPIXEL * 4);
-    private static final VoxelShape REDSTONEPANEL = VoxelShapeUtils.rotate(Shapes.box(ONEPIXEL * 4, ONEPIXEL, ONEPIXEL * 14, ONEPIXEL * 13, ONEPIXEL * 13, 1D), Rotation.CLOCKWISE_90);
-    private static final VoxelShape CONNECTION = VoxelShapeUtils.rotate(Shapes.box(ONEPIXEL * 7, ONEPIXEL * 7, ONEPIXEL * 12, ONEPIXEL * 10, ONEPIXEL * 11, ONEPIXEL * 14), Rotation.CLOCKWISE_90);
+    private static final VoxelShape REDSTONEPANEL = MiscHelper.rotate(Shapes.box(ONEPIXEL * 4, ONEPIXEL, ONEPIXEL * 14, ONEPIXEL * 13, ONEPIXEL * 13, 1D), Rotation.CLOCKWISE_90);
+    private static final VoxelShape CONNECTION = MiscHelper.rotate(Shapes.box(ONEPIXEL * 7, ONEPIXEL * 7, ONEPIXEL * 12, ONEPIXEL * 10, ONEPIXEL * 11, ONEPIXEL * 14), Rotation.COUNTERCLOCKWISE_90);
+    private static final VoxelShape NORTH_R = Shapes.or(BOTTOM, SUPPORT, MIDDLE, CONNECTION, REDSTONEPANEL).optimize();
+    private static final BlockBehaviour.Properties PROPERTIES = BlockBehaviour.Properties.of().strength(1.4F, 5).requiresCorrectToolForDrops().noOcclusion();
 
-    public static final VoxelShape NORTH_R = Shapes.or(BOTTOM, SUPPORT, MIDDLE, CONNECTION, REDSTONEPANEL).optimize();
-
-    public static ONIBlockBuilder<ONIBaseLoggableMachine<CoalGenTE>> createBlock() {
-        return new ONIBlockBuilder<>(ONIConstants.LangKeys.COAL_GEN, () -> new ONIBaseLoggableMachine<>(BlockBehaviour.Properties.of(Material.METAL).strength(1.4F, 5).requiresCorrectToolForDrops().noOcclusion(), CoalGenTE.class, ONIBlocks.Machines.Power.COAL_GEN_TE), ONIConstants.Geo.COAL_GEN_ISTER, true)
+    public static ONIBlockBuilder<ONIBaseMachine<CoalGenTE>> createBlock() {
+        return new ONIBlockBuilder<ONIBaseMachine<CoalGenTE>>(ONIConstants.LangKeys.COAL_GEN, () -> new ONIBaseMachine<CoalGenTE>(PROPERTIES, CoalGenTE.class, ONIBlocks.COAL_GEN_TE), ONIConstants.Geo.COAL_GEN_ISTER)
                 .placementCondition(ONIConstants.PlacementConditions::fourByFourCondition)
                 .renderType((state) -> RenderShape.ENTITYBLOCK_ANIMATED)
                 .autoRotateShape()
                 .shape((state, world, pos, ctx) -> NORTH_R)
-                .container(new ONIIHasGui() {
-                    @Override
-                    public AbstractContainerMenu container(int i, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {
-                        return ONIBlocks.Machines.Power.COAL_GEN_CONTAINER_BUILDER.buildNewInstance(i, world, pos, playerInventory, playerEntity);
-                    }
-
-                    @Override
-                    public Component machineName() {
-                        return LangHelper.guiTitle(ONIConstants.LangKeys.COAL_GEN);
-                    }
-                })
+                .container((world, pos) -> ONIMenus.COALGEN_UI)
                 .setCategory(ONIItemCategory.POWER)
                 .tooltip(LangHelper.itemTooltip(ONIConstants.LangKeys.COAL_GEN))
                 .shiftToolTip()
                 .noModelGen();
     }
-
-    public static ONIContainerBuilder createContainer() {
-        return new ONIContainerBuilder(ONIConstants.LangKeys.COAL_GEN)
-                .trackPower()
-                .trackPowerCapacity()
-                .trackProgress()
-                .trackWorking()
-                .setInternalSlotArrangement(new SlotArrangement(55, 32))
-                .addInternalInventory();
+    
+    public static void registerCapabilities(RegisterCapabilitiesEvent event, BlockEntityType<CoalGenTE> type) {
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, type, (coalgen, dir) -> {
+            return coalgen.itemHandler;
+        });
+        
+        event.registerBlockEntity(ONICapabilities.PLASMA, type, (coalgen, dir) -> {
+            return coalgen.plasmaHandler;
+        });
     }
 }

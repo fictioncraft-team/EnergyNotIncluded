@@ -15,7 +15,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PacketUpdateClientBE(BlockPos pos, CompoundTag nbt) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Type<PacketUpdateClientBE> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(ONIUtils.MODID, "updateClientBE"));
+    public static final CustomPacketPayload.Type<PacketUpdateClientBE> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(ONIUtils.MODID, "update_client_be"));
     public static final StreamCodec<ByteBuf, PacketUpdateClientBE> CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC,
             PacketUpdateClientBE::pos,

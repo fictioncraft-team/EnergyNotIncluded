@@ -2,7 +2,6 @@ package com.github.wintersteve25.energynotincluded.common.data.plasma.api;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.UnknownNullability;
 
 public class Plasma implements IPlasma {
 
@@ -76,7 +75,7 @@ public class Plasma implements IPlasma {
     }
 
     @Override
-    public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("power", power);
         nbt.putString("type", type.name());

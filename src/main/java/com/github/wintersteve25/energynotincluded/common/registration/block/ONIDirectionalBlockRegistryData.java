@@ -1,19 +1,20 @@
 package com.github.wintersteve25.energynotincluded.common.registration.block;
 
+import com.github.wintersteve25.energynotincluded.common.datagen.server.LootTableDrop;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 
 public class ONIDirectionalBlockRegistryData extends ONIBlockRegistryData {
     private final int angleOffset;
     private final ModelFile modelFile;
 
-    public ONIDirectionalBlockRegistryData(boolean doStateGen, boolean doModelGen, boolean doLangGen, boolean doLootTableGen, int angleOffset, ModelFile modelFile) {
-        super(doStateGen, doModelGen, doLangGen, doLootTableGen);
+    public ONIDirectionalBlockRegistryData(boolean doStateGen, boolean doModelGen, boolean doLangGen, LootTableDrop lootTable, int angleOffset, ModelFile modelFile) {
+        super(doStateGen, doModelGen, doLangGen, lootTable);
         this.angleOffset = angleOffset;
         this.modelFile = modelFile;
     }
 
     public ONIDirectionalBlockRegistryData(int angleOffset, ModelFile modelFile) {
-        this(false, true, true, true, angleOffset, modelFile);
+        this(false, true, true, LootTableDrop.dropSelf(), angleOffset, modelFile);
     }
 
     public ONIDirectionalBlockRegistryData() {

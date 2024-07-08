@@ -1,55 +1,53 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.items;
 
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.world.item.BlockItem;
-import net.minecraftforge.client.IItemRenderProperties;
-import net.minecraftforge.common.util.Lazy;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseBlock;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ONIBaseAnimatedBlockItem extends ONIBaseItemBlock implements IAnimatable {
+public class ONIBaseAnimatedBlockItem extends ONIBaseItemBlock implements GeoItem {
 
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private final Supplier<BlockEntityWithoutLevelRenderer> animatedModel;
-
-    public ONIBaseAnimatedBlockItem(ONIBaseBlock blockIn, Supplier<BlockEntityWithoutLevelRenderer> animatedModel, Properties builder) {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    
+    public ONIBaseAnimatedBlockItem(ONIBaseBlock blockIn, Properties builder, Supplier<BlockEntityWithoutLevelRenderer> animatedModel) {
         super(blockIn, builder);
         this.animatedModel = animatedModel;
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
     @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        super.initializeClient(consumer);
-        consumer.accept(new IItemRenderProperties() {
-            private final Lazy<Lazy<BlockEntityWithoutLevelRenderer>> renderer = Lazy.of(() -> Lazy.of(animatedModel));
-
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        consumer.accept(new GeoRenderProvider() {
+            private BlockEntityWithoutLevelRenderer ister;
+            
             @Override
-            public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
-                return renderer.get().get();
+            public BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
+                if (ister == null) {
+                    ister = animatedModel.get();
+                }
+                
+                return ister;
             }
         });
     }
 
-    public <P extends BlockItem & IAnimatable> PlayState predicate(AnimationEvent<P> event) {
-        return PlayState.CONTINUE;
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, state -> PlayState.STOP));
     }
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 1, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
     }
 }

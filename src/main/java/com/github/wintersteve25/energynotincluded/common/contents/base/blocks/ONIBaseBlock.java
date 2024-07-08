@@ -1,7 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
-import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.ONIIForceStoppable;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IRenderTypeProvider;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IVoxelShapeProvider;
 import net.minecraft.core.BlockPos;
@@ -57,16 +56,6 @@ public class ONIBaseBlock extends Block implements SimpleWaterloggedBlock {
         if (tile instanceof ONIIBoundingBlock block) {
             block.onPlace();
         }
-
-        if (tile instanceof ONIIForceStoppable forceStoppable) {
-            if (forceStoppable.isInverted()) {
-                forceStoppable.setForceStopped(!worldIn.hasNeighborSignal(pos));
-            } else {
-                forceStoppable.setForceStopped(worldIn.hasNeighborSignal(pos));
-            }
-        }
-
-        tile.onPlacedBy(worldIn, pos, state, placer, stack);
     }
 
     public IVoxelShapeProvider getHitBox() {

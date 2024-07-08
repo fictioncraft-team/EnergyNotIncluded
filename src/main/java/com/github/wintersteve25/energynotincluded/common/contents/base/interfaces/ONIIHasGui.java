@@ -10,8 +10,7 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ON
  * Should be implemented on a {@link ONIBaseMachine}
  * Or to be used in {@link com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIBlockBuilder#container(ONIIHasGui)}
  */
+@FunctionalInterface
 public interface ONIIHasGui {
     TauMenuHolder container(Level world, BlockPos pos);
-
-    Component machineName();
 }

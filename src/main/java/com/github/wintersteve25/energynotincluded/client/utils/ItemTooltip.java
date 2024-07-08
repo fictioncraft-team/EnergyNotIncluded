@@ -2,6 +2,7 @@ package com.github.wintersteve25.energynotincluded.client.utils;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.ItemStack;
@@ -15,8 +16,8 @@ public class ItemTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void renderImage(Font pFont, int x, int y, PoseStack pPoseStack, ItemRenderer pItemRenderer, int pBlitOffset) {
-        pItemRenderer.renderGuiItem(itemStack, x, y);
+    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+        guiGraphics.renderItem(itemStack, x, y);
     }
 
     @Override

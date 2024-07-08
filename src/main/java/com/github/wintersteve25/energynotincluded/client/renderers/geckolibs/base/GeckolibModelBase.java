@@ -1,12 +1,12 @@
 package com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base;
 
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.model.GeoModel;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.utils.helpers.ResoureceLocationHelper;
 
-public class GeckolibModelBase<T extends IAnimatable> extends AnimatedGeoModel<T> {
+public class GeckolibModelBase<T extends GeoAnimatable> extends GeoModel<T> {
     private final ResourceLocation rl1;
     private final ResourceLocation rl2;
     private final ResourceLocation rl3;
@@ -25,19 +25,19 @@ public class GeckolibModelBase<T extends IAnimatable> extends AnimatedGeoModel<T
         this.rl2 = other.rl2;
         this.rl3 = other.rl3;
     }
-
+    
     @Override
-    public ResourceLocation getModelLocation(T t) {
+    public ResourceLocation getModelResource(T animatable) {
         return rl1;
     }
 
     @Override
-    public ResourceLocation getTextureLocation(T t) {
+    public ResourceLocation getTextureResource(T animatable) {
         return rl2;
     }
 
     @Override
-    public ResourceLocation getAnimationFileLocation(T t) {
+    public ResourceLocation getAnimationResource(T animatable) {
         return rl3;
     }
 }

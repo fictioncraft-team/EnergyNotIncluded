@@ -39,21 +39,21 @@ public class ONIStateProvider extends BlockStateProvider {
             }
         }
 
-        weightedRock(ONIBlocks.NonFunctionals.ABYSSALITE, 2);
-        weightedRock(ONIBlocks.NonFunctionals.BLEACH_STONE, 8);
-        weightedRock(ONIBlocks.NonFunctionals.FERTILIZER, 1);
-        weightedRock(ONIBlocks.NonFunctionals.FOSSIL, 5);
-        weightedRock(ONIBlocks.NonFunctionals.GOLD_AMALGAM, 8);
-        weightedRock(ONIBlocks.NonFunctionals.GRANITE, 8);
-        weightedRock(ONIBlocks.NonFunctionals.IGNEOUS_ROCK, 8);
-        weightedRock(ONIBlocks.NonFunctionals.MAFIC_ROCK, 8);
-        weightedRock(ONIBlocks.NonFunctionals.NEUTRONIUM, 8);
+        weightedRock(ONIBlocks.ABYSSALITE, 2);
+        weightedRock(ONIBlocks.BLEACH_STONE, 8);
+        weightedRock(ONIBlocks.FERTILIZER, 1);
+        weightedRock(ONIBlocks.FOSSIL, 5);
+        weightedRock(ONIBlocks.GOLD_AMALGAM, 8);
+        weightedRock(ONIBlocks.GRANITE, 8);
+        weightedRock(ONIBlocks.IGNEOUS_ROCK, 8);
+        weightedRock(ONIBlocks.MAFIC_ROCK, 8);
+        weightedRock(ONIBlocks.NEUTRONIUM, 8);
 //        weightedRock(ONIBlocks.TileEntityBounded.OXYLITE_BLOCK, 8);
-        weightedRock(ONIBlocks.NonFunctionals.PHOSPHORITE, 8);
-        weightedRock(ONIBlocks.NonFunctionals.POLLUTED_ICE, 2);
-        weightedRock(ONIBlocks.NonFunctionals.REGOLITH, 8);
-        weightedRock(ONIBlocks.NonFunctionals.RUST, 1);
-        weightedRock(ONIBlocks.NonFunctionals.WOLFRAMITE, 8);
+        weightedRock(ONIBlocks.PHOSPHORITE, 8);
+        weightedRock(ONIBlocks.POLLUTED_ICE, 2);
+        weightedRock(ONIBlocks.REGOLITH, 8);
+        weightedRock(ONIBlocks.RUST, 1);
+        weightedRock(ONIBlocks.WOLFRAMITE, 8);
     }
 
     private void weightedRock(ONIBlockDeferredRegister.DeferredBlock<?, ?> block, int amoutOfAlts) {

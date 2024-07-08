@@ -5,13 +5,11 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIIItem;
-import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.cables.PowerCableBlock;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIDirectionalBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registration.item.ONIItemRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIItems;
-import com.github.wintersteve25.energynotincluded.common.contents.modules.items.modifications.ONIModificationItem;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -44,8 +42,6 @@ public class ONIModelProvider extends ItemModelProvider {
 
                 if (data instanceof ONIDirectionalBlockRegistryData directionalData) {
                     withExistingParent(name, directionalData.getModelFile().getLocation());
-                } else if (b.block().get() instanceof PowerCableBlock) {
-                    withExistingParent(name, modLoc("block/wires/" + name + "/main"));
                 } else {
                     withExistingParent(name, modLoc("block/" + name));
                 }
@@ -56,18 +52,12 @@ public class ONIModelProvider extends ItemModelProvider {
             ONIItemRegistryData data = ONIItems.ITEMS.getAllItems().get(i);
             if (data.isDoModelGen()) {
                 Item item = i.get();
-                if (item instanceof ONIModificationItem mod) {
-                    String name = i.getId().getPath();
-                    String processedName = mod.getModType().getName() + name.charAt(name.length() - 1);
-                    builder(name, "modifications/" + processedName);
-                } else {
-                    String name = i.getId().getPath();
+                String name = i.getId().getPath();
 
-                    if (item instanceof ONIIItem) {
-                        builder(name, ((ONIIItem) item).getONIItemCategory().getPathName() + name);
-                    } else {
-                        builder(name, name);
-                    }
+                if (item instanceof ONIIItem) {
+                    builder(name, ((ONIIItem) item).getONIItemCategory().getPathName() + name);
+                } else {
+                    builder(name, name);
                 }
             }
         }

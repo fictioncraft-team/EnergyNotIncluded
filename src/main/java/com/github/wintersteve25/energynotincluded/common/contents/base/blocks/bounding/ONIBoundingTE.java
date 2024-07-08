@@ -1,17 +1,18 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseTE;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * Modified from https://github.com/mekanism/Mekanism/blob/1.16.x/src/main/java/mekanism/common/tile/TileEntityBoundingBlock.java
@@ -23,7 +24,7 @@ public class ONIBoundingTE extends ONIBaseTE {
     public boolean receivedCoords;
 
     public ONIBoundingTE(BlockPos pos, BlockState state) {
-        this(ONIBlocks.Misc.BOUNDING_TE.get(), pos, state);
+        this(ONIBlocks.BOUNDING_TE.get(), pos, state);
     }
 
     public ONIBoundingTE(BlockEntityType<ONIBoundingTE> type, BlockPos pos, BlockState state) {
@@ -53,34 +54,26 @@ public class ONIBoundingTE extends ONIBaseTE {
     }
 
     @Override
-    public void load(@Nonnull CompoundTag nbtTags) {
-        super.load(nbtTags);
-        NBTUtils.setBlockPosIfPresent(nbtTags, "main", (pos) -> this.mainPos = pos);
+    public void loadAdditional(@Nonnull CompoundTag nbtTags, HolderLookup.Provider provider) {
+        super.loadAdditional(nbtTags, provider);
+        Optional<BlockPos> pos = NbtUtils.readBlockPos(nbtTags, "main");
+        pos.ifPresent(p -> this.mainPos = p);
         this.receivedCoords = nbtTags.getBoolean("receivedCoords");
     }
 
     @Nonnull
     @Override
-    public void saveAdditional(@Nonnull CompoundTag nbtTags) {
-        super.saveAdditional(nbtTags);
+    public void saveAdditional(@Nonnull CompoundTag nbtTags, HolderLookup.Provider provider) {
+        super.saveAdditional(nbtTags, provider);
         nbtTags.put("main", NbtUtils.writeBlockPos(this.getMainPos()));
         nbtTags.putBoolean("receivedCoords", this.receivedCoords);
     }
 
     @Override
-    public void handleUpdateTag(@Nonnull CompoundTag tag) {
-        super.handleUpdateTag(tag);
-        NBTUtils.setBlockPosIfPresent(tag, "main", pos -> mainPos = pos);
-        receivedCoords = tag.getBoolean(NBTConstants.RECEIVED_COORDS);
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (getMainTile() != null) {
-            return getMainTile().getCapability(cap, side);
-        }
-
-        return LazyOptional.empty();
+    public void handleUpdateTag(@Nonnull CompoundTag tag, HolderLookup.Provider provider) {
+        super.handleUpdateTag(tag, provider);
+        Optional<BlockPos> pos = NbtUtils.readBlockPos(tag, "main");
+        pos.ifPresent(p -> this.mainPos = p);
+        receivedCoords = tag.getBoolean("receivedCoords");
     }
 }

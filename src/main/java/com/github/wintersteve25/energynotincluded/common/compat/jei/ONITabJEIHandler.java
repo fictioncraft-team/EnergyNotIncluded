@@ -1,16 +1,14 @@
 package com.github.wintersteve25.energynotincluded.common.compat.jei;
 
+import com.github.wintersteve25.tau.menu.TauContainerScreen;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.client.renderer.Rect2i;
-import com.github.wintersteve25.energynotincluded.client.gui.ONIBaseGuiContainer;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class ONITabJEIHandler implements IGuiContainerHandler<ONIBaseGuiContainer<?>> {
+public class ONITabJEIHandler implements IGuiContainerHandler<TauContainerScreen> {
     @Override
-    public List<Rect2i> getGuiExtraAreas(ONIBaseGuiContainer<?> containerScreen) {
-        return containerScreen.isTabOpen() ? Arrays.asList(new Rect2i((containerScreen.width - 130 - 200) / 2, containerScreen.currentTab.getY(), 147, 167)) : Collections.emptyList();
+    public List<Rect2i> getGuiExtraAreas(TauContainerScreen containerScreen) {
+        return List.of();
     }
 }

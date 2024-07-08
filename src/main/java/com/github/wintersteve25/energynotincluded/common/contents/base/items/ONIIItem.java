@@ -1,11 +1,11 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.items;
 
 import com.github.wintersteve25.energynotincluded.common.contents.base.ONIItemCategory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraft.world.level.Level;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IPlacementCondition;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IToolTipCondition;
 import com.github.wintersteve25.energynotincluded.common.utils.ONIConstants;
@@ -53,20 +53,20 @@ public interface ONIIItem {
     default void setONIItemCategory(ONIItemCategory itemCategory) {
     }
 
-    default void tooltip(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+    default void tooltip(ItemStack stack, @Nullable Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         if (getTooltips() != null && getTooltips().get() != null && !getTooltips().get().isEmpty()) {
             IToolTipCondition condition = getTooltipCondition().get();
             if (condition == null) {
                 tooltip.addAll(getTooltips().get());
             } else {
                 if (condition == IToolTipCondition.DEFAULT.get()) {
-                    if (condition.canShow(stack, worldIn, tooltip, flagIn)) {
+                    if (condition.canShow(stack, context, tooltip, flagIn)) {
                         tooltip.addAll(getTooltips().get());
                     } else {
                         tooltip.add(ONIConstants.LangKeys.HOLD_SHIFT);
                     }
                 } else {
-                    if (condition.canShow(stack, worldIn, tooltip, flagIn)) {
+                    if (condition.canShow(stack, context, tooltip, flagIn)) {
                         tooltip.addAll(getTooltips().get());
                     } else {
                         tooltip.add(condition.textWhenNotShown());

@@ -26,7 +26,7 @@ public class ONIUtils {
     private static final DeferredRegister<CreativeModeTab> TAB_REGISTER = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ONIUtils.MODID);
     private static final DeferredHolder<CreativeModeTab, CreativeModeTab> CUSTOM_TAB = TAB_REGISTER.register(MODID, () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + MODID))
-            .icon(() -> new ItemStack(ONIBlocks.NonFunctionals.IGNEOUS_ROCK.blockItem()))
+            .icon(() -> new ItemStack(ONIBlocks.IGNEOUS_ROCK.blockItem()))
             .displayItems((displayParams, output) -> {
                 for (DeferredHolder<Item, ? extends Item> i : ONIItems.ITEMS.getAllItems().keySet()) {
                     output.accept(i.get());
@@ -48,8 +48,11 @@ public class ONIUtils {
         ONIItems.register(eventBus);
         ONISounds.register(eventBus);
         ONIRecipes.register(eventBus);
+        ONIMenus.register(eventBus);
+        ONIDataComponents.register(eventBus);
         TAB_REGISTER.register(eventBus);
 
+        eventBus.addListener(ONIMenus::registerScreens);
         eventBus.addListener(ONIServerEventsHandler::commonSetup);
         eventBus.addListener(ONIServerEventsHandler::registerPayloads);
         forgeEventBus.addListener(ONIServerEventsHandler::command);

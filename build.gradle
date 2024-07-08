@@ -14,7 +14,12 @@ base {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-minecraft.accessTransformers.files rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
+
+minecraft {
+    accessTransformers {
+        file('src/main/resources/META-INF/accesstransformer.cfg')
+    }
+}
 
 runs {
     configureEach {
@@ -87,16 +92,8 @@ dependencies {
     // geckolib
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
 
-    // mekanism
-//    compileOnly fg.deobf("mekanism:Mekanism:1.18.2-10.2.5.465:api")
-//    implementation fg.deobf("mekanism:Mekanism:1.18.2-10.2.5.465")
-
-    // curios
-//    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.9.0")
-//    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.9.0:api")
-
     // tau
-    implementation "com.github.wintersteve25.tau:Tau:2.0.0"
+    implementation "com.github.wintersteve25.tau:Tau:2.0.2"
 }
 
 tasks.withType(ProcessResources).configureEach {

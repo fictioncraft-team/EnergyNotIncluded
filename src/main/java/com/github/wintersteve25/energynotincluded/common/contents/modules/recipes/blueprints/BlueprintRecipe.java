@@ -1,21 +1,40 @@
 package com.github.wintersteve25.energynotincluded.common.contents.modules.recipes.blueprints;
 
 import com.github.wintersteve25.energynotincluded.common.registries.ONIRecipes;
-import com.github.wintersteve25.energynotincluded.common.utils.PartialItemIngredient;
+import com.github.wintersteve25.energynotincluded.common.contents.modules.recipes.CountedIngredient;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
+import java.util.List;
 import java.util.Optional;
 
-public record BlueprintRecipe(ResourceLocation id, NonNullList<PartialItemIngredient> ingredients, BlockItem output) implements Recipe<Container> {
+public record BlueprintRecipe(List<CountedIngredient> ingredients, BlockItem output) implements Recipe<Container> {
+
+    public static final MapCodec<BlueprintRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            CountedIngredient.CODEC
+                    .listOf()
+                    .fieldOf("inputs")
+                    .forGetter(BlueprintRecipe::ingredients),
+            ItemStack.STRICT_CODEC
+                    .validate(itemStack -> {
+                        if (itemStack.getItem() instanceof BlockItem) {
+                            return DataResult.success(itemStack);
+                        }
+                        
+                        return DataResult.error(() -> "");
+                    })
+                    .xmap(itemStack -> (BlockItem) itemStack.getItem(), ItemStack::new)
+                    .fieldOf("output")
+                    .forGetter(BlueprintRecipe::output)
+    ).apply(instance, BlueprintRecipe::new));
 
     @Override
     public boolean matches(Container pContainer, Level pLevel) {
@@ -47,7 +66,7 @@ public record BlueprintRecipe(ResourceLocation id, NonNullList<PartialItemIngred
         return ONIRecipes.BLUEPRINT_RECIPE_TYPE.get();
     }
 
-    public static Optional<BlueprintRecipe> getRecipeWithId(Level level, ResourceLocation id) {
+    public static Optional<RecipeHolder<BlueprintRecipe>> getRecipeWithId(Level level, ResourceLocation id) {
         return level.getRecipeManager()
                 .getAllRecipesFor(ONIRecipes.BLUEPRINT_RECIPE_TYPE.get())
                 .stream()
