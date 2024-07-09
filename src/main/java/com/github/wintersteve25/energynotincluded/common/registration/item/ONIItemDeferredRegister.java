@@ -27,8 +27,8 @@ public class ONIItemDeferredRegister {
         return register(name, () -> sup.apply(ONIUtils.defaultProperties()));
     }
 
-    public <ITEM extends Item> DeferredHolder<Item, ITEM> register(String name, Function<Item.Properties, ITEM> sup, boolean doModelGen, boolean doLangGen) {
-        return register(name, () -> sup.apply(ONIUtils.defaultProperties()), doModelGen, doLangGen);
+    public <ITEM extends Item> DeferredHolder<Item, ITEM> register(String name, Function<Item.Properties, ITEM> sup, boolean doModelGen, boolean doLangGen, boolean includeInCreativeTab) {
+        return register(name, () -> sup.apply(ONIUtils.defaultProperties()), doModelGen, doLangGen, includeInCreativeTab);
     }
 
     public <ITEM extends Item> DeferredHolder<Item, ITEM> register(String name, Function<Item.Properties, ITEM> sup, ONIItemRegistryData registryData) {
@@ -41,13 +41,13 @@ public class ONIItemDeferredRegister {
 
     public <ITEM extends Item> DeferredHolder<Item, ITEM> register(String name, Supplier<? extends ITEM> sup) {
         DeferredHolder<Item, ITEM> registeredItem = register.register(name, sup);
-        allItems.put(registeredItem, new ONIItemRegistryData(true, true));
+        allItems.put(registeredItem, new ONIItemRegistryData(true, true, true));
         return registeredItem;
     }
 
-    public <ITEM extends Item> DeferredHolder<Item, ITEM> register(String name, Supplier<? extends ITEM> sup, boolean doModelGen, boolean doLangGen) {
+    public <ITEM extends Item> DeferredHolder<Item, ITEM> register(String name, Supplier<? extends ITEM> sup, boolean doModelGen, boolean doLangGen, boolean includeInCreativeTab) {
         DeferredHolder<Item, ITEM> registeredItem = register.register(name, sup);
-        allItems.put(registeredItem, new ONIItemRegistryData(doModelGen, doLangGen));
+        allItems.put(registeredItem, new ONIItemRegistryData(doModelGen, doLangGen, includeInCreativeTab));
         return registeredItem;
     }
 

@@ -111,7 +111,7 @@ public class ONIPlaceHolderTE extends ONIBaseInvTE {
         return false;
     }
 
-    public BlockItem getInPlaceOf() {
+    public BlockState getInPlaceOf() {
         if (recipe == null) {
             return null;
         }

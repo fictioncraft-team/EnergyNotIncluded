@@ -8,7 +8,7 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.interface
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IToolTipCondition;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseItem;
 import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIIItem;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.LangHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.LangHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +28,7 @@ public class ONIItemBuilder<T extends ONIIItem> {
 
     private boolean doModelGen = true;
     private boolean doLangGen = true;
+    private boolean includeInCreativeTab = true;
 
     public ONIItemBuilder(String regName, Function<ONIBaseBlock, T> item) {
         this.regName = regName;
@@ -78,6 +79,11 @@ public class ONIItemBuilder<T extends ONIIItem> {
         doLangGen = false;
         return this;
     }
+    
+    public ONIItemBuilder<T> doNotIncludeInCreativeTab() {
+        includeInCreativeTab = false;
+        return this;
+    }
 
     public ONIItemBuilder<T> takeDurabilityDamage() {
         takeDurabilityDamage = true;
@@ -109,5 +115,9 @@ public class ONIItemBuilder<T extends ONIIItem> {
 
     public boolean isDoLangGen() {
         return doLangGen;
+    }
+
+    public boolean isIncludeInCreativeTab() {
+        return includeInCreativeTab;
     }
 }

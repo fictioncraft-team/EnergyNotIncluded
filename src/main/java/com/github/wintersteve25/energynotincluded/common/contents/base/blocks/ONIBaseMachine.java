@@ -2,34 +2,29 @@ package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.ONIIHasGui;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.ISHandlerHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.ISHandlerHelper;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ONIBaseMachine<BE extends BlockEntity> extends ONIBaseDirectional implements EntityBlock {
 
@@ -60,11 +55,16 @@ public class ONIBaseMachine<BE extends BlockEntity> extends ONIBaseDirectional i
             if (gui == null) {
                 gui = (ONIIHasGui) this;
             }
-            
+
             gui.container(world, pos).openMenu((ServerPlayer) player, pos);
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @Override
@@ -77,28 +77,21 @@ public class ONIBaseMachine<BE extends BlockEntity> extends ONIBaseDirectional i
     }
 
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (isCorrectTe(world.getBlockEntity(pos))) {
-            BlockEntity tileEntity = world.getBlockEntity(pos);
-            if (tileEntity instanceof ONIBaseTE baseTE) {
-                if (!(baseTE instanceof ONIBaseInvTE te)) {
-                    return super.playerWillDestroy(world, pos, state, player);
-                }
+    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+        super.playerDestroy(level, player, pos, state, blockEntity, tool);
 
-                if (te.hasItem()) {
-                    ISHandlerHelper.dropInventory(te, world, state, pos, te.getInvSize());
-                }
-            }
-        }
-        return super.playerWillDestroy(world, pos, state, player);
     }
 
     @Override
     public void onRemove(BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
         if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
             BlockEntity tile = world.getBlockEntity(pos);
-            if (tile instanceof ONIIBoundingBlock) {
-                ((ONIIBoundingBlock) tile).onBreak(state);
+            if (!(tile instanceof ONIBaseInvTE te)) {
+                return;
+            }
+
+            if (te.hasItem()) {
+                ISHandlerHelper.dropInventory(te, world, state, pos, te.getInvSize());
             }
         }
         super.onRemove(state, world, pos, newState, isMoving);

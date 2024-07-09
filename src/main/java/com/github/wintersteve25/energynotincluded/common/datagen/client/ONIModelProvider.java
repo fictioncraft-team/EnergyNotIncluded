@@ -2,6 +2,8 @@ package com.github.wintersteve25.energynotincluded.common.datagen.client;
 
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
@@ -42,8 +44,14 @@ public class ONIModelProvider extends ItemModelProvider {
 
                 if (b.getB() instanceof ONIDirectionalBlockRegistryData directionalData) {
                     withExistingParent(name, directionalData.getModelFile().getLocation());
-                } else {
-                    withExistingParent(name, modLoc("block/" + name));
+                    continue;
+                }
+
+                ResourceLocation defaultLoc = modLoc("block/" + name);
+                try {
+                    withExistingParent(name, defaultLoc);
+                } catch (IllegalStateException e) {
+                    withExistingParent(name, modLoc("block/" + name + "1"));
                 }
             }
         }

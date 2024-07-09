@@ -42,7 +42,11 @@ runs {
     }
 
     data {
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        programArguments.addAll((String[]) [
+                '--mod', project.mod_id,
+                '--all', '--output', file('src/generated/resources/').getAbsolutePath(),
+                '--existing', file('src/main/resources/').getAbsolutePath()
+        ])
     }
 }
 
@@ -93,7 +97,7 @@ dependencies {
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
 
     // tau
-    implementation "com.github.wintersteve25.tau:Tau:2.0.2"
+    implementation "com.github.wintersteve25.tau:Tau:2.0.4"
 }
 
 tasks.withType(ProcessResources).configureEach {

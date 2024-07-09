@@ -1,6 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.MiscHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.DirectionalBlock;
@@ -12,15 +12,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.BlockGetter;
-import org.joml.Vector3d;
-
-import java.util.List;
 
 public class ONIBaseDirectional extends ONIBaseBlock {
 
@@ -34,7 +28,7 @@ public class ONIBaseDirectional extends ONIBaseBlock {
     }
 
     public ONIBaseDirectional(int harvestLevel, float hardness, float resistance, SoundType soundType) {
-        this(Properties.of().strength(hardness, resistance).sound(soundType));
+        this(Properties.of().strength(hardness, resistance).sound(soundType).requiresCorrectToolForDrops());
     }
 
     public ONIBaseDirectional(Properties properties) {

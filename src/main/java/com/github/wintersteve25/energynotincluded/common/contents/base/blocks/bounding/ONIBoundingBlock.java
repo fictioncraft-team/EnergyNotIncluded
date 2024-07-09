@@ -73,7 +73,7 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
             return InteractionResult.FAIL;
         } else {
             BlockState state1 = world.getBlockState(mainPos);
-            return state1.useWithoutItem(world, player, hit);
+            return state1.useWithoutItem(world, player, hit.withPosition(mainPos));
         }
     }
 
@@ -84,7 +84,7 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
             return ItemInteractionResult.FAIL;
         } else {
             BlockState state1 = world.getBlockState(mainPos);
-            return state1.useItemOn(stack, world, player, hand, hit);
+            return state1.useItemOn(stack, world, player, hand, hit.withPosition(mainPos));
         }
     }
 
@@ -169,6 +169,18 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
     }
 
     @Override
+    protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
+        BlockPos mainPos = getMainBlockPos(level, pos);
+        
+        if (mainPos != null) {
+            BlockState mainState = level.getBlockState(mainPos);
+            mainState.spawnAfterBreak(level, mainPos, stack, dropExperience);
+        }
+        
+        super.spawnAfterBreak(state, level, pos, stack, dropExperience);
+    }
+
+    @Override
     public void neighborChanged(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Block neighborBlock, @Nonnull BlockPos neighborPos, boolean isMoving) {
         BlockPos mainPos = getMainBlockPos(world, pos);
         if (mainPos != null) {
@@ -196,27 +208,28 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
 
     @Nonnull
     public VoxelShape getShape(@Nonnull BlockState state, @Nonnull BlockGetter world, @Nonnull BlockPos pos, @Nonnull CollisionContext context) {
-        BlockPos mainPos = getMainBlockPos(world, pos);
-        if (mainPos == null) {
-            return Shapes.empty();
-        } else {
-            BlockState mainState;
-            try {
-                mainState = (world).getBlockState(mainPos);
-            } catch (ArrayIndexOutOfBoundsException var9) {
-                if (!(world instanceof RenderChunkRegion)) {
-                    ONIUtils.LOGGER.error("Error getting bounding block shape, for position {}, with main position {}. World of type {}", pos, mainPos, world.getClass().getName());
-                    return Shapes.empty();
-                }
-
-                world = ((RenderChunkRegion) world).level;
-                mainState = (world).getBlockState(mainPos);
-            }
-
-            VoxelShape shape = mainState.getShape(world, mainPos, context);
-            BlockPos offset = pos.subtract(mainPos);
-            return shape.move(-offset.getX(), -offset.getY(), -offset.getZ());
-        }
+        return Shapes.block();
+//        BlockPos mainPos = getMainBlockPos(world, pos);
+//        if (mainPos == null) {
+//            return Shapes.empty();
+//        } else {
+//            BlockState mainState;
+//            try {
+//                mainState = (world).getBlockState(mainPos);
+//            } catch (ArrayIndexOutOfBoundsException var9) {
+//                if (!(world instanceof RenderChunkRegion)) {
+//                    ONIUtils.LOGGER.error("Error getting bounding block shape, for position {}, with main position {}. World of type {}", pos, mainPos, world.getClass().getName());
+//                    return Shapes.empty();
+//                }
+//
+//                world = ((RenderChunkRegion) world).level;
+//                mainState = (world).getBlockState(mainPos);
+//            }
+//
+//            VoxelShape shape = mainState.getShape(world, mainPos, context);
+//            BlockPos offset = pos.subtract(mainPos);
+//            return shape.move(-offset.getX(), -offset.getY(), -offset.getZ());
+//        }
     }
 
     @Override

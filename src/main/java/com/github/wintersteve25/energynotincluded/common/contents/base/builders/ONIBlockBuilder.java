@@ -35,6 +35,7 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
     private boolean doStateGen = false;
     private boolean doModelGen = true;
     private boolean doLangGen = true;
+    private boolean includeInCreativeTab = true;
     private LootTableDrop lootTableDrop = LootTableDrop.dropSelf();
 
     public ONIBlockBuilder(String regName, Supplier<T> block) {
@@ -126,6 +127,12 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
         blockItem.noLangGen();
         return this;
     }
+    
+    public ONIBlockBuilder<T> doNotIncludeInCreativeTab() {
+        includeInCreativeTab = false;
+        blockItem.doNotIncludeInCreativeTab();
+        return this;
+    }
 
     public ONIBlockBuilder<T> lootTable(LootTableDrop drop) {
         lootTableDrop = drop;
@@ -162,5 +169,9 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
 
     public LootTableDrop getLootTableDrop() {
         return lootTableDrop;
+    }
+
+    public boolean isIncludeInCreativeTab() {
+        return includeInCreativeTab;
     }
 }

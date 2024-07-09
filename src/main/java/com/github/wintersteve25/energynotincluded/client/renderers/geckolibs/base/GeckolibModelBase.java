@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.GeoModel;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.ResoureceLocationHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.ResoureceLocationHelper;
 
 public class GeckolibModelBase<T extends GeoAnimatable> extends GeoModel<T> {
     private final ResourceLocation rl1;

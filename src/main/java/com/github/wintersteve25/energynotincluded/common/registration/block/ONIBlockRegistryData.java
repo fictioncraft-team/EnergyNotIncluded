@@ -7,15 +7,14 @@ public class ONIBlockRegistryData extends ONIItemRegistryData {
     private final boolean doStateGen;
     private final LootTableDrop doLootTableGen;
 
-    public ONIBlockRegistryData(boolean doStateGen, boolean doModelGen, boolean doLangGen, LootTableDrop doLootTableGen) {
-        super(doModelGen, doLangGen);
-
+    public ONIBlockRegistryData(boolean doStateGen, boolean doModelGen, boolean doLangGen, LootTableDrop doLootTableGen, boolean includeInCreativeTab) {
+        super(doModelGen, doLangGen, includeInCreativeTab);
         this.doStateGen = doStateGen;
         this.doLootTableGen = doLootTableGen;
     }
 
     public ONIBlockRegistryData() {
-        this(false, true, true, LootTableDrop.dropSelf());
+        this(false, true, true, LootTableDrop.dropSelf(), true);
     }
 
     public boolean isDoStateGen() {

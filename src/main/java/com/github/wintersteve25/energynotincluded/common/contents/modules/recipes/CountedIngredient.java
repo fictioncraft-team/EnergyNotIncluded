@@ -23,25 +23,4 @@ public record CountedIngredient(Ingredient ingredient, int count) implements Pre
     public boolean test(ItemStack itemStack) {
         return ingredient.test(itemStack);
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (CountedIngredient) obj;
-        return Objects.equals(this.ingredient, that.ingredient) &&
-                this.count == that.count;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(ingredient, count);
-    }
-
-    @Override
-    public String toString() {
-        return "PartialItemIngredient[" +
-                "ingredient=" + ingredient + ", " +
-                "count=" + count + ']';
-    }
 }

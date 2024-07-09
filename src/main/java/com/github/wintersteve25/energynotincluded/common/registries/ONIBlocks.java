@@ -20,9 +20,8 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bo
 import com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIBlockBuilder;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockDeferredRegister;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIDirectionalBlockRegistryData;
-import com.github.wintersteve25.energynotincluded.common.utils.ONIConstants;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.ModelFileHelper;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.ResoureceLocationHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.ModelFileHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.ResoureceLocationHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -35,11 +34,11 @@ public class ONIBlocks {
     public static final ONIBlockEntityDeferredRegister BLOCK_ENTITIES = new ONIBlockEntityDeferredRegister(ONIUtils.MODID);
 
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> IGNEOUS_ROCK = BLOCKS.register("igneous_rock", () -> new ONIBaseBlock(1, 2, 6));
-    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseDirectional, ONIBaseItemBlock> SEDIMENTARY_ROCK = BLOCKS.register(ONIConstants.LangKeys.SEDIMENTARY_ROCK, () -> new ONIBaseDirectional(0, 4, 10), new ONIDirectionalBlockRegistryData(0, ModelFileHelper.createModelFile(ResoureceLocationHelper.ResourceLocationBuilder
+    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseDirectional, ONIBaseItemBlock> SEDIMENTARY_ROCK = BLOCKS.register("sedimentary_rock", () -> new ONIBaseDirectional(0, 4, 10), new ONIDirectionalBlockRegistryData(0, ModelFileHelper.createModelFile(ResoureceLocationHelper.ResourceLocationBuilder
             .getBuilder()
             .block()
             .rocks()
-            .addPath(ONIConstants.LangKeys.SEDIMENTARY_ROCK)
+            .addPath("sedimentary_rock")
             .build())));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> MAFIC_ROCK = BLOCKS.register("mafic_rock", () -> new ONIBaseBlock(2, 5, 18));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> REGOLITH = BLOCKS.register("regolith", () -> new ONIBaseBlock(1, 5, 18));
@@ -48,10 +47,10 @@ public class ONIBlocks {
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> BLEACH_STONE = BLOCKS.register("bleach_stone", () -> new ONIBaseBlock(1, 1.5F, 2));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> RUST = BLOCKS.register("rust", () -> new ONIBaseBlock(1, 1.5F, 2));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> POLLUTED_ICE = BLOCKS.register("polluted_ice", () -> new ONIBaseBlock(BlockBehaviour.Properties.of().sound(SoundType.GLASS).strength(0.7F, 1).friction(0.98F)));
-    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> ALGAE = BLOCKS.register("algae", () -> new ONIBaseBlock(BlockBehaviour.Properties.of().sound(SoundType.CROP).strength(0.2F, 1)), true, true, true, LootTableDrop.dropSelf());
+    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> ALGAE = BLOCKS.register("algae", () -> new ONIBaseBlock(BlockBehaviour.Properties.of().sound(SoundType.CROP).strength(0.2F, 1)), true, true, true, LootTableDrop.dropSelf(), true);
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> PHOSPHORITE = BLOCKS.register("phosphorite", () -> new ONIBaseBlock(1, 1, 2));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> FERTILIZER = BLOCKS.register("fertilizer", () -> new ONIBaseBlock(BlockBehaviour.Properties.of().sound(SoundType.CROP).strength(0.2F, 1)));
-    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> GOLD_AMALGAM = BLOCKS.register("gold_amalgam", () -> new ONIBaseBlock(2, 3, 5));
+    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> GOLD_AMALGAM = BLOCKS.register("gold_amalgam", () -> new ONIBaseBlock(2, 5, 5));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> WOLFRAMITE = BLOCKS.register("wolframite", () -> new ONIBaseBlock(2, 6, 20));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> ABYSSALITE = BLOCKS.register("abyssalite", () -> new ONIBaseBlock(2, 5, 15));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> GRANITE = BLOCKS.register("granite", () -> new ONIBaseBlock(2, 4, 12));
@@ -59,15 +58,15 @@ public class ONIBlocks {
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseMachine<CoalGenTE>, BlockItem> COAL_GEN_BLOCK = registerBuilder(CoalGenTE.createBlock());
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CoalGenTE>> COAL_GEN_TE = BLOCK_ENTITIES.register(COAL_GEN_BLOCK, CoalGenTE::new, CoalGenTE::registerCapabilities);
 
-    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBoundingBlock, ONIBaseItemBlock> BOUNDING_BLOCK = BLOCKS.register("bounding_block", ONIBoundingBlock::new, false, false, false, LootTableDrop.dontGenerate());
+    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBoundingBlock, ONIBaseItemBlock> BOUNDING_BLOCK = BLOCKS.register("bounding_block", ONIBoundingBlock::new, false, false, false, LootTableDrop.noDrop(), false);
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ONIBoundingTE>> BOUNDING_TE = BLOCK_ENTITIES.register(BOUNDING_BLOCK, ONIBoundingTE::new);
 
-    public static final ONIBlockDeferredRegister.DeferredBlock<ONIPlaceHolderBlock, ONIBaseItemBlock> PLACEHOLDER_BLOCK = BLOCKS.register("placeholder", ONIPlaceHolderBlock::new, false, false, false, LootTableDrop.dontGenerate());
+    public static final ONIBlockDeferredRegister.DeferredBlock<ONIPlaceHolderBlock, ONIBaseItemBlock> PLACEHOLDER_BLOCK = BLOCKS.register("placeholder", ONIPlaceHolderBlock::new, false, false, false, LootTableDrop.noDrop(), false);
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ONIPlaceHolderTE>> PLACEHOLDER_TE = BLOCK_ENTITIES.register(PLACEHOLDER_BLOCK, ONIPlaceHolderTE::new);
 
     private static <T extends ONIBaseBlock> ONIBlockDeferredRegister.DeferredBlock<T, BlockItem> registerBuilder(ONIBlockBuilder<T> builder) {
         Tuple<Lazy<T>, Function<ONIBaseBlock, ONIBaseItemBlock>> build = builder.build();
-        return BLOCKS.register(builder.getRegName(), () -> build.getA().get(), (b) -> build.getB().apply(b), builder.isDoStateGen(), builder.isDoModelGen(), builder.isDoLangGen(), builder.getLootTableDrop());
+        return BLOCKS.register(builder.getRegName(), () -> build.getA().get(), (b) -> build.getB().apply(b), builder.isDoStateGen(), builder.isDoModelGen(), builder.isDoLangGen(), builder.getLootTableDrop(), builder.isIncludeInCreativeTab());
     }
 
     public static void register(IEventBus bus) {

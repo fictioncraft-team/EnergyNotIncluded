@@ -9,6 +9,11 @@ import java.util.List;
 public class ONITabJEIHandler implements IGuiContainerHandler<TauContainerScreen> {
     @Override
     public List<Rect2i> getGuiExtraAreas(TauContainerScreen containerScreen) {
-        return List.of();
+        return List.of(new Rect2i(
+                containerScreen.getGuiLeft(),
+                containerScreen.getGuiTop(),
+                containerScreen.width,
+                containerScreen.height
+        ));
     }
 }

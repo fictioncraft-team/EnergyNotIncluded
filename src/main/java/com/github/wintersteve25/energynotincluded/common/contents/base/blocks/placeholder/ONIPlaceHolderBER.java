@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Math;
 import org.joml.Vector3f;
@@ -28,7 +29,7 @@ public class ONIPlaceHolderBER implements BlockEntityRenderer<ONIPlaceHolderTE> 
 
     @Override
     public void render(ONIPlaceHolderTE pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
-        BlockItem blockItem = pBlockEntity.getInPlaceOf();
+        BlockState blockItem = pBlockEntity.getInPlaceOf();
         if (blockItem == null) return;
 
         pPoseStack.pushPose();
@@ -40,7 +41,7 @@ public class ONIPlaceHolderBER implements BlockEntityRenderer<ONIPlaceHolderTE> 
         pPoseStack.translate(0, -0.5f, 0);
 
         MultiplyAlphaRenderTypeBuffer buffer = new MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().renderBuffers().bufferSource(), Math.max(pBlockEntity.getCompletionPercentage(), 0.3f));
-        renderDispatcher.renderSingleBlock(blockItem.getBlock().defaultBlockState(), pPoseStack, buffer, 15728640, OverlayTexture.RED_OVERLAY_V, ModelData.EMPTY, RenderType.translucent());
+        renderDispatcher.renderSingleBlock(blockItem, pPoseStack, buffer, 15728640, OverlayTexture.RED_OVERLAY_V, ModelData.EMPTY, RenderType.translucent());
 
         pPoseStack.popPose();
     }

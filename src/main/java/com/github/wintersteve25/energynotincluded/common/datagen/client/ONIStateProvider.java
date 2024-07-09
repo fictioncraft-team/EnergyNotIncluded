@@ -6,9 +6,9 @@ import com.github.wintersteve25.energynotincluded.common.registration.block.ONIB
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registration.block.ONIDirectionalBlockRegistryData;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.ModelFileHelper;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.ResoureceLocationHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.MiscHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.ModelFileHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.ResoureceLocationHelper;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
@@ -39,8 +39,8 @@ public class ONIStateProvider extends BlockStateProvider {
             }
         }
 
-        weightedRock(ONIBlocks.ABYSSALITE, 2);
-        weightedRock(ONIBlocks.BLEACH_STONE, 8);
+        weightedRock(ONIBlocks.ABYSSALITE, 3);
+        weightedRock(ONIBlocks.BLEACH_STONE, 9);
         weightedRock(ONIBlocks.FERTILIZER, 1);
         weightedRock(ONIBlocks.FOSSIL, 5);
         weightedRock(ONIBlocks.GOLD_AMALGAM, 8);
@@ -61,21 +61,19 @@ public class ONIStateProvider extends BlockStateProvider {
         weightedState(block.block().get(), name, new ResourceLocation(ONIUtils.MODID, "block/rocks/" + name), amoutOfAlts);
     }
 
-    private void weightedState(Block block, String modelBaseName, ResourceLocation textureBaseLocation, int amountOfAlts) {
+    private void weightedState(Block block, String modelBaseName, ResourceLocation textureBaseLocation, int textureCount) {
         getVariantBuilder(block)
                 .forAllStates(state -> {
-                    int weight = 100 / amountOfAlts;
-
-                    ConfiguredModel.Builder<?> builder = ConfiguredModel.builder()
-                            .modelFile(ModelFileHelper.cubeAll(modelBaseName, textureBaseLocation, models()))
-                            .weight(weight)
-                            .nextModel();
-
-                    for (int i = 1; i <= amountOfAlts; i++) {
-                        builder.modelFile(ModelFileHelper.cubeAll(modelBaseName + "_alt" + i, ResoureceLocationHelper.extend(textureBaseLocation, "_alt"), models()))
+                    int weight = 100 / textureCount;
+                    
+                    ConfiguredModel.Builder<?> builder = ConfiguredModel.builder();
+                    for (int i = 1; i <= textureCount; i++) {
+                        ResourceLocation tex = ResoureceLocationHelper.extend(textureBaseLocation, String.valueOf(i));
+                        
+                        builder.modelFile(ModelFileHelper.cubeAll(modelBaseName + i, tex, models()))
                                 .weight(weight);
 
-                        if (i < amountOfAlts) {
+                        if (i < textureCount) {
                             builder.nextModel();
                         }
                     }

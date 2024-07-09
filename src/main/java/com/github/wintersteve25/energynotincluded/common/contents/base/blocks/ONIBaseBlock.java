@@ -3,7 +3,11 @@ package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IRenderTypeProvider;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IVoxelShapeProvider;
+import com.github.wintersteve25.energynotincluded.common.utils.ISHandlerHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.MiscHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -14,6 +18,7 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -30,7 +35,7 @@ public class ONIBaseBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     public ONIBaseBlock(int harvestLevel, float destroyTime, float explosionRes, SoundType soundType) {
-        this(Properties.of().strength(destroyTime, explosionRes).sound(soundType));
+        this(Properties.of().strength(destroyTime, explosionRes).sound(soundType).requiresCorrectToolForDrops());
     }
 
     public ONIBaseBlock(Properties properties) {
@@ -40,6 +45,11 @@ public class ONIBaseBlock extends Block implements SimpleWaterloggedBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return getHitBox() == null ? super.getShape(state, worldIn, pos, context) : getHitBox().createShape(state, worldIn, pos, context);
+    }
+
+    @Override
+    protected VoxelShape getInteractionShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return getShape(state, level, pos, CollisionContext.empty());
     }
 
     @Override
@@ -54,8 +64,28 @@ public class ONIBaseBlock extends Block implements SimpleWaterloggedBlock {
         }
 
         if (tile instanceof ONIIBoundingBlock block) {
-            block.onPlace();
+            Direction facing = state.getValue(BlockStateProperties.FACING);
+            block.getDefinition().foreachBoundingLocation(facing, pos, (p) -> {
+                MiscHelper.makeBoundingBlock(worldIn, p, pos);
+                return false;
+            });
         }
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
+            BlockEntity tile = level.getBlockEntity(pos);
+            if (tile instanceof ONIIBoundingBlock block) {
+                Direction facing = state.getValue(BlockStateProperties.FACING);
+                block.getDefinition().foreachBoundingLocation(facing, pos, (p) -> {
+                    level.removeBlock(p, false);
+                    return false;
+                });
+            }
+        }
+        
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     public IVoxelShapeProvider getHitBox() {

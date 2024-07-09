@@ -1,5 +1,5 @@
 {
-  "type": "oniutils:blueprint",
+  "type": "energynotincluded:blueprint",
   "inputs": [
     {
       "item": {
@@ -14,5 +14,7 @@
       "count": 1
     }
   ],
-  "output": "oniutils:coal_generator"
+  "output": {
+    "Name": "energynotincluded:coal_generator"
+  }
 }

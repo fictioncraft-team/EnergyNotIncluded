@@ -1,10 +1,18 @@
 package com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal;
 
+import com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base.GeckolibItemRendererBase;
+import com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base.GeckolibModelBase;
 import com.github.wintersteve25.energynotincluded.common.contents.base.ONIItemCategory;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseMachine;
+import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.BoundingShapeDefinition;
+import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.RelativeDir;
+import com.github.wintersteve25.energynotincluded.common.contents.base.items.ONIBaseAnimatedBlockItem;
 import com.github.wintersteve25.energynotincluded.common.registries.ONICapabilities;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIMenus;
+import com.github.wintersteve25.energynotincluded.common.utils.MultiblockPlacementHelper;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -21,7 +29,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import org.joml.Vector3d;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.*;
 import com.github.wintersteve25.energynotincluded.common.data.plasma.api.EnumPlasmaTileType;
 import com.github.wintersteve25.energynotincluded.common.data.plasma.api.Plasma;
@@ -30,17 +37,17 @@ import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bo
 import com.github.wintersteve25.energynotincluded.common.contents.base.builders.ONIBlockBuilder;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIConfig;
-import com.github.wintersteve25.energynotincluded.common.utils.ONIConstants;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.LangHelper;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.LangHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.MiscHelper;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
-import static com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper.ONEPIXEL;
+import static com.github.wintersteve25.energynotincluded.common.utils.MiscHelper.ONEPIXEL;
 
 public class CoalGenTE extends ONIBaseInvTE implements ONIITickableServer, ONIIBoundingBlock, ONIIHasValidItems, GeoBlockEntity {
 
@@ -49,7 +56,7 @@ public class CoalGenTE extends ONIBaseInvTE implements ONIITickableServer, ONIIB
     private boolean removedFirstItem = false;
 
     private int progress = 0;
-    private final int totalProgress = ONIConfig.Server.COALGEN_PROCESS_TIME.getAsInt();
+    private int totalProgress = ONIConfig.Server.COALGEN_PROCESS_TIME.getAsInt();
 
     public CoalGenTE(BlockPos pos, BlockState state) {
         super(ONIBlocks.COAL_GEN_TE.get(), pos, state);
@@ -96,12 +103,30 @@ public class CoalGenTE extends ONIBaseInvTE implements ONIITickableServer, ONIIB
     public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         super.loadAdditional(tag, provider);
         plasmaHandler.deserializeNBT(provider, tag.getCompound("plasma"));
+        progress = tag.getInt("progress");
     }
 
     @Override
     public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         super.saveAdditional(tag, provider);
         tag.put("plasma", plasmaHandler.serializeNBT(provider));
+        tag.putInt("progress", progress);
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public int getTotalProgress() {
+        return totalProgress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public void setTotalProgress(int totalProgress) {
+        this.totalProgress = totalProgress;
     }
 
     @Override
@@ -117,9 +142,9 @@ public class CoalGenTE extends ONIBaseInvTE implements ONIITickableServer, ONIIB
     private PlayState animationPredicate(AnimationState<CoalGenTE> state) {
         AnimationController<CoalGenTE> controller = state.getController();
         controller.transitionLength(80);
-        
+
         if (progress > 0) {
-            controller.setAnimation(RawAnimation.begin().thenLoop("animation.motor.new"));
+            controller.setAnimation(RawAnimation.begin().thenLoop("generating"));
             return PlayState.CONTINUE;
         } else {
             controller.setAnimation(RawAnimation.begin());
@@ -138,66 +163,8 @@ public class CoalGenTE extends ONIBaseInvTE implements ONIITickableServer, ONIIB
     }
 
     @Override
-    public double getTick(Object object) {
-        return 0;
-    }
-
-    @Override
-    public void onPlace() {
-        Direction facing = getBlockState().getValue(BlockStateProperties.FACING);
-
-        switch (facing) {
-            case NORTH:
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().east(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above().east(), this.getBlockPos());
-                break;
-            case SOUTH:
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().west(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above().west(), this.getBlockPos());
-                break;
-            case EAST:
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().south(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above().south(), this.getBlockPos());
-                break;
-            case WEST:
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().north(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above(), this.getBlockPos());
-                MiscHelper.makeBoundingBlock(this.getLevel(), this.getBlockPos().above().north(), this.getBlockPos());
-                break;
-        }
-    }
-
-    @Override
-    public void onBreak(BlockState oldState) {
-        if (this.level != null) {
-            Direction facing = getBlockState().getValue(BlockStateProperties.FACING);
-
-            switch (facing) {
-                case NORTH:
-                    this.level.removeBlock(this.getBlockPos().east(), false);
-                    this.level.removeBlock(this.getBlockPos().above(), false);
-                    this.level.removeBlock(this.getBlockPos().above().east(), false);
-                    break;
-                case SOUTH:
-                    this.level.removeBlock(this.getBlockPos().west(), false);
-                    this.level.removeBlock(this.getBlockPos().above(), false);
-                    this.level.removeBlock(this.getBlockPos().above().west(), false);
-                    break;
-                case EAST:
-                    this.level.removeBlock(this.getBlockPos().south(), false);
-                    this.level.removeBlock(this.getBlockPos().above(), false);
-                    this.level.removeBlock(this.getBlockPos().above().south(), false);
-                    break;
-                case WEST:
-                    this.level.removeBlock(this.getBlockPos().north(), false);
-                    this.level.removeBlock(this.getBlockPos().above(), false);
-                    this.level.removeBlock(this.getBlockPos().above().north(), false);
-                    break;
-            }
-        }
+    public BoundingShapeDefinition getDefinition() {
+        return BOUNDING_SHAPE_DEFINITION;
     }
 
     private static final VoxelShape BOTTOM1 = Shapes.box(0D, 0, 0D, 1D, ONEPIXEL + (ONEPIXEL / 16) * 2, 1D);
@@ -211,25 +178,48 @@ public class CoalGenTE extends ONIBaseInvTE implements ONIITickableServer, ONIIB
     private static final VoxelShape CONNECTION = MiscHelper.rotate(Shapes.box(ONEPIXEL * 7, ONEPIXEL * 7, ONEPIXEL * 12, ONEPIXEL * 10, ONEPIXEL * 11, ONEPIXEL * 14), Rotation.COUNTERCLOCKWISE_90);
     private static final VoxelShape NORTH_R = Shapes.or(BOTTOM, SUPPORT, MIDDLE, CONNECTION, REDSTONEPANEL).optimize();
     private static final BlockBehaviour.Properties PROPERTIES = BlockBehaviour.Properties.of().strength(1.4F, 5).requiresCorrectToolForDrops().noOcclusion();
+    private static final BoundingShapeDefinition BOUNDING_SHAPE_DEFINITION = new BoundingShapeDefinition(
+            new short[][][]{
+                    {
+                            {1, -1, 1},
+                            {1, 1, 1},
+                    },
+                    {
+                            {1, 1, 1},
+                            {1, 1, 1}
+                    },
+                    {
+                            {1, 1, 1},
+                            {1, 1, 1}
+                    }
+            },
+            new Vec3i(0, 0, 1)
+    );
+
+    public static final GeckolibModelBase<CoalGenTE> COAL_GEN_TE = new GeckolibModelBase<>("machines/power/coal_generator.geo.json", "machines/power/coal_generator.png", "machines/power/coal_generator.animation.json");
+    public static final GeckolibModelBase<ONIBaseAnimatedBlockItem> COAL_GEN_IB = new GeckolibModelBase<>(COAL_GEN_TE);
+    private static final Supplier<BlockEntityWithoutLevelRenderer> COAL_GEN_ISTER = () -> new GeckolibItemRendererBase<>(COAL_GEN_IB);
+
+    public static final String ID = "coal_generator";
 
     public static ONIBlockBuilder<ONIBaseMachine<CoalGenTE>> createBlock() {
-        return new ONIBlockBuilder<ONIBaseMachine<CoalGenTE>>(ONIConstants.LangKeys.COAL_GEN, () -> new ONIBaseMachine<CoalGenTE>(PROPERTIES, CoalGenTE.class, ONIBlocks.COAL_GEN_TE), ONIConstants.Geo.COAL_GEN_ISTER)
-                .placementCondition(ONIConstants.PlacementConditions::fourByFourCondition)
+        return new ONIBlockBuilder<>(ID, () -> new ONIBaseMachine<CoalGenTE>(PROPERTIES, CoalGenTE.class, ONIBlocks.COAL_GEN_TE), COAL_GEN_ISTER)
+                .placementCondition(MultiblockPlacementHelper.makeConditionFor(BOUNDING_SHAPE_DEFINITION))
                 .renderType((state) -> RenderShape.ENTITYBLOCK_ANIMATED)
                 .autoRotateShape()
                 .shape((state, world, pos, ctx) -> NORTH_R)
                 .container((world, pos) -> ONIMenus.COALGEN_UI)
                 .setCategory(ONIItemCategory.POWER)
-                .tooltip(LangHelper.itemTooltip(ONIConstants.LangKeys.COAL_GEN))
+                .tooltip(LangHelper.itemTooltip(ID))
                 .shiftToolTip()
                 .noModelGen();
     }
-    
+
     public static void registerCapabilities(RegisterCapabilitiesEvent event, BlockEntityType<CoalGenTE> type) {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, type, (coalgen, dir) -> {
             return coalgen.itemHandler;
         });
-        
+
         event.registerBlockEntity(ONICapabilities.PLASMA, type, (coalgen, dir) -> {
             return coalgen.plasmaHandler;
         });

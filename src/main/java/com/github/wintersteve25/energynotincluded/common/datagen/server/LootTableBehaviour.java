@@ -4,5 +4,7 @@ public enum LootTableBehaviour {
     SELF,
     SILKTOUCH,
     OTHER,
+    OTHER_SILKTOUCH,
+    NO_DROP,
     DONT_GENERATE
 }

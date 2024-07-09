@@ -13,11 +13,19 @@ public record LootTableDrop(LootTableBehaviour behaviour, @Nullable ItemLike oth
         return new LootTableDrop(LootTableBehaviour.SILKTOUCH, null);
     }
     
-    public static LootTableDrop dropOther(ItemLike itemLike) {
-        return new LootTableDrop(LootTableBehaviour.OTHER, itemLike);
+    public static LootTableDrop dropOther(ItemLike other) {
+        return new LootTableDrop(LootTableBehaviour.OTHER, other);
     }
     
     public static LootTableDrop dontGenerate() {
         return new LootTableDrop(LootTableBehaviour.DONT_GENERATE, null);
+    }
+
+    public static LootTableDrop dropOtherWhenSilktouch(ItemLike other) {
+        return new LootTableDrop(LootTableBehaviour.OTHER_SILKTOUCH, other);
+    }
+    
+    public static LootTableDrop noDrop() {
+        return new LootTableDrop(LootTableBehaviour.NO_DROP, null);
     }
 }

@@ -68,7 +68,7 @@ public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlo
             return ItemStack.EMPTY;
         }
 
-        return new ItemStack(te.getInPlaceOf());
+        return new ItemStack(te.getInPlaceOf().getBlock());
     }
 
     @Override
@@ -79,13 +79,13 @@ public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlo
             return super.getShape(state, worldIn, pos, context);
         }
 
-        BlockItem item = te.getInPlaceOf();
+        BlockState item = te.getInPlaceOf();
 
         if (item == null) {
             return super.getShape(state, worldIn, pos, context);
         }
 
-        return item.getBlock().defaultBlockState().getShape(worldIn, pos, context);
+        return item.getShape(worldIn, pos, context);
     }
 
     @Override

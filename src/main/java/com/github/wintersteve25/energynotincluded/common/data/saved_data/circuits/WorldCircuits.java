@@ -4,20 +4,14 @@ import com.github.wintersteve25.energynotincluded.common.utils.SerializableMap;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class WorldCircuits extends SavedData {
 

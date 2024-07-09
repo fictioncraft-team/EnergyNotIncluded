@@ -1,16 +1,14 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base;
 
-import com.github.wintersteve25.energynotincluded.common.utils.ONIConstants;
 import net.minecraft.ChatFormatting;
 
 public enum ONIItemCategory {
     GENERAL("", null),
-    GADGETS("gadgets/", ONIConstants.TextColor.GADGETS),
-    FURNITURE("furniture/", ONIConstants.TextColor.FURNITURE_CAT_COLOR),
-    OXYGEN("oxygen/", ONIConstants.TextColor.OXYGEN_CAT_COLOR),
-    POWER("power/", ONIConstants.TextColor.POWER_CAT_COLOR),
-    TE_BOUNDED("te_bounded/", ONIConstants.TextColor.TE_BOUNDING_CAT_COLOR),
-    VENTILATION("ventilation/", ONIConstants.TextColor.VENTILATION_CAT_COLOR);
+    GADGETS("gadgets/", ChatFormatting.LIGHT_PURPLE),
+    FURNITURE("furniture/", ChatFormatting.YELLOW),
+    OXYGEN("oxygen/", ChatFormatting.AQUA),
+    POWER("power/", ChatFormatting.RED),
+    VENTILATION("ventilation/", ChatFormatting.GREEN);
 
     private final String pathName;
     private final ChatFormatting color;

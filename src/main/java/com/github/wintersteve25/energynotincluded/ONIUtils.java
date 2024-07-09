@@ -35,6 +35,7 @@ public class ONIUtils {
                 }
 
                 for (Tuple<ONIBlockDeferredRegister.DeferredBlock<?, ?>, ONIBlockRegistryData> b : ONIBlocks.BLOCKS.getAllBlocks()) {
+                    if (!b.getB().isIncludeInCreativeTab()) continue;
                     output.accept(b.getA().blockItem().get());
                 }
             })

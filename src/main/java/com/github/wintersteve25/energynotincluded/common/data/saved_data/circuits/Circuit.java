@@ -1,6 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.data.saved_data.circuits;
 
-import com.github.wintersteve25.energynotincluded.common.utils.helpers.MiscHelper;
+import com.github.wintersteve25.energynotincluded.common.utils.MiscHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;

@@ -2,36 +2,27 @@ package com.github.wintersteve25.energynotincluded.common.contents.modules.recip
 
 import com.github.wintersteve25.energynotincluded.common.registries.ONIRecipes;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.recipes.CountedIngredient;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 import java.util.Optional;
 
-public record BlueprintRecipe(List<CountedIngredient> ingredients, BlockItem output) implements Recipe<Container> {
+public record BlueprintRecipe(List<CountedIngredient> ingredients, BlockState output) implements Recipe<Container> {
 
     public static final MapCodec<BlueprintRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             CountedIngredient.CODEC
                     .listOf()
                     .fieldOf("inputs")
                     .forGetter(BlueprintRecipe::ingredients),
-            ItemStack.STRICT_CODEC
-                    .validate(itemStack -> {
-                        if (itemStack.getItem() instanceof BlockItem) {
-                            return DataResult.success(itemStack);
-                        }
-                        
-                        return DataResult.error(() -> "");
-                    })
-                    .xmap(itemStack -> (BlockItem) itemStack.getItem(), ItemStack::new)
+            BlockState.CODEC
                     .fieldOf("output")
                     .forGetter(BlueprintRecipe::output)
     ).apply(instance, BlueprintRecipe::new));
