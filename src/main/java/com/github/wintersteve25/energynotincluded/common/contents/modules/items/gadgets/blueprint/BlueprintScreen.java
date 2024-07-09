@@ -4,9 +4,17 @@ import com.github.wintersteve25.energynotincluded.common.contents.modules.recipe
 import com.github.wintersteve25.energynotincluded.common.registries.ONIRecipes;
 import com.github.wintersteve25.tau.components.base.DynamicUIComponent;
 import com.github.wintersteve25.tau.components.base.UIComponent;
+import com.github.wintersteve25.tau.components.interactable.ListView;
+import com.github.wintersteve25.tau.components.layout.Align;
+import com.github.wintersteve25.tau.components.layout.Row;
 import com.github.wintersteve25.tau.components.utils.Container;
+import com.github.wintersteve25.tau.components.utils.Padding;
+import com.github.wintersteve25.tau.components.utils.Text;
 import com.github.wintersteve25.tau.layout.Layout;
+import com.github.wintersteve25.tau.layout.LayoutSetting;
 import com.github.wintersteve25.tau.theme.Theme;
+import com.github.wintersteve25.tau.utils.FlexSizeBehaviour;
+import com.github.wintersteve25.tau.utils.Pad;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.common.util.Lazy;
@@ -20,6 +28,17 @@ public class BlueprintScreen extends DynamicUIComponent {
 
     @Override
     public UIComponent build(Layout layout, Theme theme) {
-        return new Container.Builder();
+        return new Align.Builder()
+                .withVertical(LayoutSetting.END)
+                .withHorizontal(LayoutSetting.START)
+                .build(new ListView.Builder()
+                        .withSpacing(4)
+                        .build(RECIPES.get().stream().map(this::recipe).toList()));
+    }
+
+    private UIComponent recipe(RecipeHolder<BlueprintRecipe> recipe) {
+        return new Container.Builder()
+                .withSizeBehaviour(FlexSizeBehaviour.MIN)
+                .withChild(new Padding(new Pad(8, 8, 8, 8), new Text.Builder(recipe.value().output().getBlock().getName())));
     }
 }

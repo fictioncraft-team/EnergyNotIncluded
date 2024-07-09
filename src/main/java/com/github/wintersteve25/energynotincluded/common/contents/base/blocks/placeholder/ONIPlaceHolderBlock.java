@@ -56,6 +56,10 @@ public class ONIPlaceHolderBlock extends ONIBaseDirectional implements EntityBlo
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         ONIPlaceHolderTE te = getTileEntityOrThrow(ONIPlaceHolderTE.class, pLevel, pPos);
+        if (te.getInPlaceOf() == null || te.getInPlaceOf().isEmpty()) {
+            super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+            return;
+        }
         pLevel.getServer().getPlayerList().broadcastSystemMessage(Component.translatable("oniutils.message.requests.buildCanceled", te.getInPlaceOf().getBlock().getName()), true);
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }

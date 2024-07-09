@@ -1,7 +1,14 @@
 {
   "variants": {
-    "": {
-      "model": "energynotincluded:block/polluted_ice2"
-    }
+    "": [
+      {
+        "model": "energynotincluded:block/polluted_ice1",
+        "weight": 50
+      },
+      {
+        "model": "energynotincluded:block/polluted_ice2",
+        "weight": 50
+      }
+    ]
   }
 }

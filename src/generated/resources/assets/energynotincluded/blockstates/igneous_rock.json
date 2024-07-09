@@ -1,7 +1,38 @@
 {
   "variants": {
-    "": {
-      "model": "energynotincluded:block/igneous_rock8"
-    }
+    "": [
+      {
+        "model": "energynotincluded:block/igneous_rock1",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/igneous_rock2",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/igneous_rock3",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/igneous_rock4",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/igneous_rock5",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/igneous_rock6",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/igneous_rock7",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/igneous_rock8",
+        "weight": 12
+      }
+    ]
   }
 }

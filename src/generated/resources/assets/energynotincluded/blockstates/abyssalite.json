@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "energynotincluded:block/abyssalite3"
-    }
+    "": [
+      {
+        "model": "energynotincluded:block/abyssalite1",
+        "weight": 33
+      },
+      {
+        "model": "energynotincluded:block/abyssalite2",
+        "weight": 33
+      },
+      {
+        "model": "energynotincluded:block/abyssalite3",
+        "weight": 33
+      }
+    ]
   }
 }

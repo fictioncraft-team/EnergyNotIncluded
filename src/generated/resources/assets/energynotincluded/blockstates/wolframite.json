@@ -1,7 +1,38 @@
 {
   "variants": {
-    "": {
-      "model": "energynotincluded:block/wolframite8"
-    }
+    "": [
+      {
+        "model": "energynotincluded:block/wolframite1",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/wolframite2",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/wolframite3",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/wolframite4",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/wolframite5",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/wolframite6",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/wolframite7",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/wolframite8",
+        "weight": 12
+      }
+    ]
   }
 }

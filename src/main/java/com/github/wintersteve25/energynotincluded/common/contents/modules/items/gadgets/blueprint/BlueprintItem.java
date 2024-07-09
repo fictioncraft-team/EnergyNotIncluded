@@ -57,11 +57,6 @@ public class BlueprintItem extends ONIBaseItem {
 
         Level level = pContext.getLevel();
         if (!level.isInWorldBounds(targetPosition)) return InteractionResult.PASS;
-
-        BlockItem placeHolder = ONIBlocks.PLACEHOLDER_BLOCK.blockItem().get();
-        InteractionResult result = placeHolder.place(new BlockPlaceContext(level, player, pContext.getHand(), ItemStack.EMPTY, new BlockHitResult(pContext.getClickLocation(), face, targetPosition, false)));
-
-        if (!result.consumesAction()) return InteractionResult.PASS;
         if (level instanceof ServerLevel serverLevel) {
             BlockEntity blockEntity = serverLevel.getBlockEntity(targetPosition);
             ItemData data = pContext.getItemInHand().get(ONIDataComponents.BLUEPRINT_ITEM_DATA.get());
@@ -69,6 +64,9 @@ public class BlueprintItem extends ONIBaseItem {
             if (data.recipeSelected() == null) return InteractionResult.PASS;
             var recipe = BlueprintRecipe.getRecipeWithId(level, data.recipeSelected());
             if (recipe.isEmpty()) return InteractionResult.PASS;
+
+            BlockItem placeHolder = ONIBlocks.PLACEHOLDER_BLOCK.blockItem().get();
+            InteractionResult result = placeHolder.place(new BlockPlaceContext(level, player, pContext.getHand(), ItemStack.EMPTY, new BlockHitResult(pContext.getClickLocation(), face, targetPosition, false)));
             
             if (blockEntity instanceof ONIPlaceHolderTE placeHolderTE) {
                 placeHolderTE.init(recipe.get());

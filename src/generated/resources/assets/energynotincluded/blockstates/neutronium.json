@@ -1,7 +1,38 @@
 {
   "variants": {
-    "": {
-      "model": "energynotincluded:block/neutronium8"
-    }
+    "": [
+      {
+        "model": "energynotincluded:block/neutronium1",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/neutronium2",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/neutronium3",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/neutronium4",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/neutronium5",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/neutronium6",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/neutronium7",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/neutronium8",
+        "weight": 12
+      }
+    ]
   }
 }

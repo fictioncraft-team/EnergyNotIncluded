@@ -1,7 +1,38 @@
 {
   "variants": {
-    "": {
-      "model": "energynotincluded:block/phosphorite8"
-    }
+    "": [
+      {
+        "model": "energynotincluded:block/phosphorite1",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/phosphorite2",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/phosphorite3",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/phosphorite4",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/phosphorite5",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/phosphorite6",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/phosphorite7",
+        "weight": 12
+      },
+      {
+        "model": "energynotincluded:block/phosphorite8",
+        "weight": 12
+      }
+    ]
   }
 }

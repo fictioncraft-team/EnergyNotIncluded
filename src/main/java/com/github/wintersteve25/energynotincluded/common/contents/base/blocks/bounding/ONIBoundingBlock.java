@@ -208,28 +208,27 @@ public class ONIBoundingBlock extends ONIBaseBlock implements EntityBlock {
 
     @Nonnull
     public VoxelShape getShape(@Nonnull BlockState state, @Nonnull BlockGetter world, @Nonnull BlockPos pos, @Nonnull CollisionContext context) {
-        return Shapes.block();
-//        BlockPos mainPos = getMainBlockPos(world, pos);
-//        if (mainPos == null) {
-//            return Shapes.empty();
-//        } else {
-//            BlockState mainState;
-//            try {
-//                mainState = (world).getBlockState(mainPos);
-//            } catch (ArrayIndexOutOfBoundsException var9) {
-//                if (!(world instanceof RenderChunkRegion)) {
-//                    ONIUtils.LOGGER.error("Error getting bounding block shape, for position {}, with main position {}. World of type {}", pos, mainPos, world.getClass().getName());
-//                    return Shapes.empty();
-//                }
-//
-//                world = ((RenderChunkRegion) world).level;
-//                mainState = (world).getBlockState(mainPos);
-//            }
-//
-//            VoxelShape shape = mainState.getShape(world, mainPos, context);
-//            BlockPos offset = pos.subtract(mainPos);
-//            return shape.move(-offset.getX(), -offset.getY(), -offset.getZ());
-//        }
+        BlockPos mainPos = getMainBlockPos(world, pos);
+        if (mainPos == null) {
+            return Shapes.empty();
+        } else {
+            BlockState mainState;
+            try {
+                mainState = (world).getBlockState(mainPos);
+            } catch (ArrayIndexOutOfBoundsException var9) {
+                if (!(world instanceof RenderChunkRegion)) {
+                    ONIUtils.LOGGER.error("Error getting bounding block shape, for position {}, with main position {}. World of type {}", pos, mainPos, world.getClass().getName());
+                    return Shapes.empty();
+                }
+
+                world = ((RenderChunkRegion) world).level;
+                mainState = (world).getBlockState(mainPos);
+            }
+
+            VoxelShape shape = mainState.getShape(world, mainPos, context);
+            BlockPos offset = pos.subtract(mainPos);
+            return shape.move(-offset.getX(), -offset.getY(), -offset.getZ());
+        }
     }
 
     @Override

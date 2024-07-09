@@ -48,7 +48,6 @@ public class ONIStateProvider extends BlockStateProvider {
         weightedRock(ONIBlocks.IGNEOUS_ROCK, 8);
         weightedRock(ONIBlocks.MAFIC_ROCK, 8);
         weightedRock(ONIBlocks.NEUTRONIUM, 8);
-//        weightedRock(ONIBlocks.TileEntityBounded.OXYLITE_BLOCK, 8);
         weightedRock(ONIBlocks.PHOSPHORITE, 8);
         weightedRock(ONIBlocks.POLLUTED_ICE, 2);
         weightedRock(ONIBlocks.REGOLITH, 8);
@@ -74,7 +73,7 @@ public class ONIStateProvider extends BlockStateProvider {
                                 .weight(weight);
 
                         if (i < textureCount) {
-                            builder.nextModel();
+                            builder = builder.nextModel();
                         }
                     }
 
