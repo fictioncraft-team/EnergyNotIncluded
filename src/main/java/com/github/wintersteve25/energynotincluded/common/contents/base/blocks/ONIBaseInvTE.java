@@ -36,14 +36,14 @@ public abstract class ONIBaseInvTE extends ONIBaseTE {
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-        super.loadAdditional(tag, provider);
+    public void readSavedData(CompoundTag tag, HolderLookup.Provider provider) {
+        super.readSavedData(tag, provider);
         itemHandler.deserializeNBT(provider, tag.getCompound("inv"));
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-        super.saveAdditional(tag, provider);
+    public void writeSavedData(CompoundTag tag, HolderLookup.Provider provider) {
+        super.writeSavedData(tag, provider);
         tag.put("inv", itemHandler.serializeNBT(provider));
     }
 

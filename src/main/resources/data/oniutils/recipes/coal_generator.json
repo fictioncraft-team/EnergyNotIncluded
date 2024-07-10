@@ -16,5 +16,6 @@
   ],
   "output": {
     "Name": "energynotincluded:coal_generator"
-  }
+  },
+  "texture": "energynotincluded:coal_generator"
 }

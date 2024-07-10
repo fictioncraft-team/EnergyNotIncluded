@@ -1,5 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.items;
 
+import com.github.wintersteve25.energynotincluded.client.utils.ItemRendererWrapper;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseBlock;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -16,10 +17,10 @@ import java.util.function.Supplier;
 
 public class ONIBaseAnimatedBlockItem extends ONIBaseItemBlock implements GeoItem {
 
-    private final Supplier<BlockEntityWithoutLevelRenderer> animatedModel;
+    private final Supplier<ItemRendererWrapper> animatedModel;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    public ONIBaseAnimatedBlockItem(ONIBaseBlock blockIn, Properties builder, Supplier<BlockEntityWithoutLevelRenderer> animatedModel) {
+    public ONIBaseAnimatedBlockItem(ONIBaseBlock blockIn, Properties builder, Supplier<ItemRendererWrapper> animatedModel) {
         super(blockIn, builder);
         this.animatedModel = animatedModel;
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
@@ -33,7 +34,7 @@ public class ONIBaseAnimatedBlockItem extends ONIBaseItemBlock implements GeoIte
             @Override
             public BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
                 if (ister == null) {
-                    ister = animatedModel.get();
+                    ister = animatedModel.get().renderer().get();
                 }
                 
                 return ister;

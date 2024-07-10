@@ -45,26 +45,6 @@ public class MiscHelper {
     public static int randomInRange(int min, int max) {
         return new Random().nextInt((max - min) + 1) + min;
     }
-
-    /**
-     * Method modified from <a href="https://github.com/mekanism/Mekanism/blob/1.16.x/src/main/java/mekanism/common/util/WorldUtils.java#L537">...</a>
-     */
-    public static void makeBoundingBlock(@Nullable LevelAccessor world, BlockPos boundingLocation, BlockPos orig) {
-        if (world == null) {
-            return;
-        }
-        
-        ONIBoundingBlock boundingBlock = ONIBlocks.BOUNDING_BLOCK.block().get();
-        BlockState newState = boundingBlock.defaultBlockState();
-        world.setBlock(boundingLocation, newState, 3);
-
-        if (world.isClientSide()) return;
-        if (world.getBlockEntity(boundingLocation) instanceof ONIBoundingTE tile) {
-            tile.setMainLocation(orig);
-        } else {
-            ONIUtils.LOGGER.warn("Unable to find Bounding Block Tile at: {}", boundingLocation);
-        }
-    }
     
     public static BlockPos readBlockPos(Tag tag) {
         if (tag instanceof IntArrayTag intTags) {

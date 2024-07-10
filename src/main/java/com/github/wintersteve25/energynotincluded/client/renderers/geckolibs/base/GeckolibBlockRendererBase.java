@@ -1,5 +1,6 @@
 package com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base;
 
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.model.GeoModel;
@@ -10,8 +11,8 @@ public class GeckolibBlockRendererBase<T extends BlockEntity & GeoBlockEntity> e
         super(modelProvider);
     }
 
-//    @Override
-//    public RenderType getRenderType(T animatable, float partialTicks, PoseStack stack, MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, ResourceLocation textureLocation) {
-//        return RenderType.entityTranslucent(getTextureLocation(animatable));
-//    }
+    @Override
+    protected Direction getFacing(T block) {
+        return super.getFacing(block).getOpposite();
+    }
 }

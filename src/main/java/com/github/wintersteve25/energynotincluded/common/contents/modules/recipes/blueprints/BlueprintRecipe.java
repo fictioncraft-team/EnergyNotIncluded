@@ -15,7 +15,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 import java.util.Optional;
 
-public record BlueprintRecipe(List<CountedIngredient> ingredients, BlockState output) implements Recipe<Container> {
+public record BlueprintRecipe(
+        List<CountedIngredient> ingredients,
+        BlockState output,
+        Optional<ResourceLocation> texture
+) implements Recipe<Container> {
 
     public static final MapCodec<BlueprintRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             CountedIngredient.CODEC
@@ -24,7 +28,10 @@ public record BlueprintRecipe(List<CountedIngredient> ingredients, BlockState ou
                     .forGetter(BlueprintRecipe::ingredients),
             BlockState.CODEC
                     .fieldOf("output")
-                    .forGetter(BlueprintRecipe::output)
+                    .forGetter(BlueprintRecipe::output),
+            ResourceLocation.CODEC
+                    .optionalFieldOf("texture")
+                    .forGetter(BlueprintRecipe::texture)
     ).apply(instance, BlueprintRecipe::new));
 
     @Override

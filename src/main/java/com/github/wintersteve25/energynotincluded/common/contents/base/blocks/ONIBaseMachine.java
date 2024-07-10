@@ -2,7 +2,6 @@ package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.ItemStack;
@@ -18,9 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.Level;
-import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.ONIIHasGui;
-import com.github.wintersteve25.energynotincluded.common.utils.ISHandlerHelper;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import javax.annotation.Nonnull;
@@ -41,10 +38,6 @@ public class ONIBaseMachine<BE extends BlockEntity> extends ONIBaseDirectional i
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult pHitResult) {
-        if (world.isClientSide()) {
-            return super.useWithoutItem(state, world, pos, player, pHitResult);
-        }
-
         BlockEntity tileEntity = world.getBlockEntity(pos);
 
         if (!isCorrectTe(tileEntity)) {
@@ -56,15 +49,14 @@ public class ONIBaseMachine<BE extends BlockEntity> extends ONIBaseDirectional i
                 gui = (ONIIHasGui) this;
             }
 
+            if (world.isClientSide()) {
+                return InteractionResult.SUCCESS_NO_ITEM_USED;
+            }
+
             gui.container(world, pos).openMenu((ServerPlayer) player, pos);
         }
 
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        return InteractionResult.SUCCESS_NO_ITEM_USED;
     }
 
     @Override
@@ -74,27 +66,6 @@ public class ONIBaseMachine<BE extends BlockEntity> extends ONIBaseDirectional i
             return ((ONIBaseTE) tile).canConnectRedstone(state, world, pos, side);
         }
         return super.canConnectRedstone(state, world, pos, side);
-    }
-
-    @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-
-    }
-
-    @Override
-    public void onRemove(BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
-            BlockEntity tile = world.getBlockEntity(pos);
-            if (!(tile instanceof ONIBaseInvTE te)) {
-                return;
-            }
-
-            if (te.hasItem()) {
-                ISHandlerHelper.dropInventory(te, world, state, pos, te.getInvSize());
-            }
-        }
-        super.onRemove(state, world, pos, newState, isMoving);
     }
 
     @Override

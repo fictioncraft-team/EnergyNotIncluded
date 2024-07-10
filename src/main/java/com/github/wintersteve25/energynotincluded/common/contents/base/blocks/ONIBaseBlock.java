@@ -1,13 +1,11 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
-import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.bounding.ONIIBoundingBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IRenderTypeProvider;
 import com.github.wintersteve25.energynotincluded.common.contents.base.interfaces.functional.IVoxelShapeProvider;
 import com.github.wintersteve25.energynotincluded.common.utils.ISHandlerHelper;
 import com.github.wintersteve25.energynotincluded.common.utils.MiscHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -56,32 +54,13 @@ public class ONIBaseBlock extends Block implements SimpleWaterloggedBlock {
     public RenderShape getRenderShape(BlockState state) {
         return getRenderType() == null ? super.getRenderShape(state) : getRenderType().createRenderType(state);
     }
-
-    @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        if (!(worldIn.getBlockEntity(pos) instanceof ONIBaseTE tile)) {
-            return;
-        }
-
-        if (tile instanceof ONIIBoundingBlock block) {
-            Direction facing = state.getValue(BlockStateProperties.FACING);
-            block.getDefinition().foreachBoundingLocation(facing, pos, (p) -> {
-                MiscHelper.makeBoundingBlock(worldIn, p, pos);
-                return false;
-            });
-        }
-    }
-
+    
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
             BlockEntity tile = level.getBlockEntity(pos);
-            if (tile instanceof ONIIBoundingBlock block) {
-                Direction facing = state.getValue(BlockStateProperties.FACING);
-                block.getDefinition().foreachBoundingLocation(facing, pos, (p) -> {
-                    level.removeBlock(p, false);
-                    return false;
-                });
+            if (tile instanceof ONIBaseInvTE te && te.hasItem()) {
+                ISHandlerHelper.dropInventory(te, level, state, pos, te.getInvSize());
             }
         }
         

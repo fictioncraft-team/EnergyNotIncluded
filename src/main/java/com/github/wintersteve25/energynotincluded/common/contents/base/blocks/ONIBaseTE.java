@@ -1,6 +1,7 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.blocks;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerLevel;
@@ -49,25 +50,73 @@ public class ONIBaseTE extends BlockEntity {
         if (level == null) return;
     }
 
+    // sync-write when block update over network
+    // basically proxy to same behaviour as chunk load
     @Override
     @Nullable
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @Nonnull
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-        CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, provider);
-        return tag;
-    }
-
+    // sync-read when block update over network
+    // basically proxy to same behaviour as chunk load
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider provider) {
         if (!isServer() && net.getDirection() == PacketFlow.CLIENTBOUND) {
             handleUpdateTag(pkt.getTag(), provider);
         }
+    }
+
+    // sync-write when chunk load over network
+    @Nonnull
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        CompoundTag tag = new CompoundTag();
+        writeSyncedData(tag, provider);
+        writeSavedAndSyncedData(tag, provider);
+        return tag;
+    }
+
+    // sync-read when chunk load over network
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+        readSyncedData(tag, lookupProvider);
+        // will read saved data as well
+        super.handleUpdateTag(tag, lookupProvider);
+    }
+
+    // read persistent data
+    @Override
+    protected final void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        readSavedData(tag, registries);
+        readSavedAndSyncedData(tag, registries);
+    }
+
+    // write persistent data
+    @Override
+    protected final void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        writeSavedData(tag, registries);
+        writeSavedAndSyncedData(tag, registries);
+    }
+    
+    protected void writeSyncedData(CompoundTag tag, HolderLookup.Provider provider) {
+    }
+
+    protected void writeSavedData(CompoundTag tag, HolderLookup.Provider provider) {
+    }
+
+    protected void writeSavedAndSyncedData(CompoundTag tag, HolderLookup.Provider provider) {
+    }
+
+    protected void readSyncedData(CompoundTag tag, HolderLookup.Provider provider) {
+    }
+
+    protected void readSavedData(CompoundTag tag, HolderLookup.Provider provider) {
+    }
+
+    protected void readSavedAndSyncedData(CompoundTag tag, HolderLookup.Provider provider) {
     }
 
     protected void sendNBTUpdatePacket() {

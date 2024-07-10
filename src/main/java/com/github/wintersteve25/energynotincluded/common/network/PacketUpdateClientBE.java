@@ -27,35 +27,33 @@ public record PacketUpdateClientBE(BlockPos pos, CompoundTag nbt) implements Cus
     public PacketUpdateClientBE(BlockEntity teIn, CompoundTag compoundNBT) {
         this(teIn.getBlockPos(), compoundNBT);
     }
-
-    public static void handle(PacketUpdateClientBE data, IPayloadContext ctx) {
-        ctx.enqueueWork(() -> {
-            if (data.pos == null) {
-                ONIUtils.LOGGER.error("Requested update but position is null");
-                return;
-            }
-
-            ClientLevel level = Minecraft.getInstance().level;
-
-            if (level == null) {
-                ONIUtils.LOGGER.error("Requested update at {} but level does not exist", data.pos);
-                return;
-            }
-
-            BlockEntity te = level.getBlockEntity(data.pos);
-
-            if (te == null) {
-                ONIUtils.LOGGER.error("Requested update at {} but no te is found", data.pos);
-                return;
-            }
-
-            if (data.nbt == null) return;
-            te.handleUpdateTag(data.nbt, ctx.player().registryAccess());
-        });
-    }
-
+    
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
+    }
+
+    public static void handle(PacketUpdateClientBE data, IPayloadContext ctx) {
+        if (data.pos() == null) {
+            ONIUtils.LOGGER.error("Requested update but position is null");
+            return;
+        }
+
+        ClientLevel level = Minecraft.getInstance().level;
+
+        if (level == null) {
+            ONIUtils.LOGGER.error("Requested update at {} but level does not exist", data.pos());
+            return;
+        }
+
+        BlockEntity te = level.getBlockEntity(data.pos());
+
+        if (te == null) {
+            ONIUtils.LOGGER.error("Requested update at {} but no te is found", data.pos());
+            return;
+        }
+
+        if (data.nbt() == null) return;
+        te.handleUpdateTag(data.nbt(), ctx.player().registryAccess());
     }
 }

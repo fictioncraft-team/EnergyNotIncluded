@@ -1,9 +1,9 @@
 package com.github.wintersteve25.energynotincluded.common.contents.base.builders;
 
+import com.github.wintersteve25.energynotincluded.client.utils.ItemRendererWrapper;
 import com.github.wintersteve25.energynotincluded.common.contents.base.ONIItemCategory;
 import com.github.wintersteve25.energynotincluded.common.datagen.server.LootTableDrop;
 import net.minecraft.util.Tuple;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
@@ -42,11 +42,11 @@ public class ONIBlockBuilder<T extends ONIBaseBlock> {
         this(regName, block, null);
     }
 
-    public ONIBlockBuilder(String regName, Supplier<T> block, @Nullable Supplier<BlockEntityWithoutLevelRenderer> ister) {
+    public ONIBlockBuilder(String regName, Supplier<T> block, @Nullable Supplier<ItemRendererWrapper> ister) {
         this(regName, block, ONIUtils.defaultProperties(), ister);
     }
 
-    public ONIBlockBuilder(String regName, Supplier<T> block, Item.Properties properties, @Nullable Supplier<BlockEntityWithoutLevelRenderer> ister) {
+    public ONIBlockBuilder(String regName, Supplier<T> block, Item.Properties properties, @Nullable Supplier<ItemRendererWrapper> ister) {
         this.block = block;
         this.regName = regName;
         if (ister != null) {

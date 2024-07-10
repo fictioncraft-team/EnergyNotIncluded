@@ -1,5 +1,6 @@
 package com.github.wintersteve25.energynotincluded.common.registries;
 
+import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseBoundingMachine;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.ONIBaseMachine;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.placeholder.ONIPlaceHolderBlock;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.placeholder.ONIPlaceHolderTE;
@@ -55,7 +56,7 @@ public class ONIBlocks {
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> ABYSSALITE = BLOCKS.register("abyssalite", () -> new ONIBaseBlock(2, 5, 15));
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBlock, ONIBaseItemBlock> GRANITE = BLOCKS.register("granite", () -> new ONIBaseBlock(2, 4, 12));
 
-    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseMachine<CoalGenTE>, BlockItem> COAL_GEN_BLOCK = registerBuilder(CoalGenTE.createBlock());
+    public static final ONIBlockDeferredRegister.DeferredBlock<ONIBaseBoundingMachine<CoalGenTE>, BlockItem> COAL_GEN_BLOCK = registerBuilder(CoalGenTE.createBlock());
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CoalGenTE>> COAL_GEN_TE = BLOCK_ENTITIES.register(COAL_GEN_BLOCK, CoalGenTE::new, CoalGenTE::registerCapabilities);
 
     public static final ONIBlockDeferredRegister.DeferredBlock<ONIBoundingBlock, ONIBaseItemBlock> BOUNDING_BLOCK = BLOCKS.register("bounding_block", ONIBoundingBlock::new, false, false, false, LootTableDrop.noDrop(), false);

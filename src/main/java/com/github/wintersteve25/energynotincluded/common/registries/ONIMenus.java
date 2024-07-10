@@ -3,6 +3,7 @@ package com.github.wintersteve25.energynotincluded.common.registries;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal.CoalGenGui;
 import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal.CoalGenTE;
+import com.github.wintersteve25.tau.menu.TauMenuHelper;
 import com.github.wintersteve25.tau.menu.TauMenuHolder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -21,6 +22,6 @@ public class ONIMenus {
     }
     
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        COALGEN_UI.registerScreen(event);
+        TauMenuHelper.registerMenuScreen(event, COALGEN_UI);
     }
 }

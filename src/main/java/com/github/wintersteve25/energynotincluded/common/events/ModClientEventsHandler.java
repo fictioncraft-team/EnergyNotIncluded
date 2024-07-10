@@ -3,7 +3,7 @@ package com.github.wintersteve25.energynotincluded.common.events;
 import com.github.wintersteve25.energynotincluded.common.contents.base.blocks.placeholder.ONIPlaceHolderBER;
 import com.github.wintersteve25.energynotincluded.ONIUtils;
 import com.github.wintersteve25.energynotincluded.client.renderers.geckolibs.base.GeckolibBlockRendererBase;
-import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal.CoalGenTE;
+import com.github.wintersteve25.energynotincluded.common.contents.modules.blocks.power.coal.CoalGenVisuals;
 import com.github.wintersteve25.energynotincluded.common.registries.ONIBlocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -22,6 +22,6 @@ public class ModClientEventsHandler {
             return;
         }
 
-        event.registerBlockEntityRenderer(ONIBlocks.COAL_GEN_TE.get(), t -> new GeckolibBlockRendererBase<>(CoalGenTE.COAL_GEN_TE));
+        event.registerBlockEntityRenderer(ONIBlocks.COAL_GEN_TE.get(), t -> new GeckolibBlockRendererBase<>(CoalGenVisuals.COAL_GEN_TE));
     }
 }

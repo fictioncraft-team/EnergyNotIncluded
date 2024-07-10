@@ -7,6 +7,8 @@ import net.minecraft.core.Vec3i;
 import java.util.function.Function;
 
 public record BoundingShapeDefinition(short[][][] shape, Vec3i controller) {
+    public static final BoundingShapeDefinition EMPTY = new BoundingShapeDefinition(new short[0][0][0], Vec3i.ZERO);
+    
     public void foreachBoundingLocation(Direction facing, BlockPos originPos, Function<BlockPos, Boolean> action) {
         short[][][] shape = shape();
         Vec3i controller = controller();

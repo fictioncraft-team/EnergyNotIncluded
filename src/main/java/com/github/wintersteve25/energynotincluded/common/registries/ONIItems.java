@@ -15,17 +15,11 @@ public class ONIItems {
 
     public static final ONIItemDeferredRegister ITEMS = new ONIItemDeferredRegister(ONIUtils.MODID);
 
-    public static class Gadgets {
-        public static final DeferredHolder<Item, ONIBaseItem> WIRE_CUTTER = registerBuilder(ONIToolItems.WIRE_CUTTER);
-        public static final DeferredHolder<Item, BlueprintItem> BLUEPRINT = registerBuilder(ONIToolItems.BLUEPRINT);
-
-        private static void register() {
-        }
-    }
+    public static final DeferredHolder<Item, ONIBaseItem> WIRE_CUTTER = registerBuilder(ONIToolItems.WIRE_CUTTER);
+    public static final DeferredHolder<Item, BlueprintItem> BLUEPRINT = registerBuilder(ONIToolItems.BLUEPRINT);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
-        Gadgets.register();
     }
 
     private static <T extends Item & ONIIItem> DeferredHolder<Item, T> registerBuilder(ONIItemBuilder<T> builder) {

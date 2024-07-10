@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
@@ -48,9 +47,9 @@ public class ONIPlaceHolderBER implements BlockEntityRenderer<ONIPlaceHolderTE> 
 
     private void rotateBasedOnDirection(PoseStack poseStack, Direction direction) {
         switch (direction) {
-            case SOUTH -> poseStack.mulPose(Axis.YP.rotation(Math.toRadians(180)));
-            case EAST -> poseStack.mulPose(Axis.YP.rotation(Math.toRadians(-90)));
-            case WEST -> poseStack.mulPose(Axis.YP.rotation(Math.toRadians(90)));
+            case NORTH -> poseStack.mulPose(Axis.YP.rotation(Math.toRadians(180)));
+            case EAST -> poseStack.mulPose(Axis.YP.rotation(Math.toRadians(90)));
+            case WEST -> poseStack.mulPose(Axis.YP.rotation(Math.toRadians(-90)));
             default -> {}
         }
     }

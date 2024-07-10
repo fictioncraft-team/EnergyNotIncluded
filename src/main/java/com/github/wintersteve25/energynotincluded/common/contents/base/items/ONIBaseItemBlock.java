@@ -44,7 +44,7 @@ public class ONIBaseItemBlock extends BlockItem implements ONIIItem {
     }
 
     @Override
-    protected boolean canPlace(BlockPlaceContext context, BlockState state) {
+    public boolean canPlace(BlockPlaceContext context, BlockState state) {
         if (placementCondition != null) {
             return super.canPlace(context, state) && placementCondition.test(context, state);
         }

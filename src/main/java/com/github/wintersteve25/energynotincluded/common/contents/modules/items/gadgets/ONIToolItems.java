@@ -14,5 +14,6 @@ public class ONIToolItems {
     
     public static ONIItemBuilder<BlueprintItem> BLUEPRINT = new ONIItemBuilder<>("blueprint", (b) -> new BlueprintItem())
             .setCategory(ONIItemCategory.GADGETS)
+            .noModelGen()
             .defaultTooltip();
 }

@@ -54,17 +54,16 @@ public class ONIBoundingTE extends ONIBaseTE {
     }
 
     @Override
-    public void loadAdditional(@Nonnull CompoundTag nbtTags, HolderLookup.Provider provider) {
-        super.loadAdditional(nbtTags, provider);
+    public void readSavedAndSyncedData(@Nonnull CompoundTag nbtTags, HolderLookup.Provider provider) {
+        super.readSavedAndSyncedData(nbtTags, provider);
         Optional<BlockPos> pos = NbtUtils.readBlockPos(nbtTags, "main");
         pos.ifPresent(p -> this.mainPos = p);
         this.receivedCoords = nbtTags.getBoolean("receivedCoords");
     }
 
-    @Nonnull
     @Override
-    public void saveAdditional(@Nonnull CompoundTag nbtTags, HolderLookup.Provider provider) {
-        super.saveAdditional(nbtTags, provider);
+    public void writeSavedAndSyncedData(@Nonnull CompoundTag nbtTags, HolderLookup.Provider provider) {
+        super.writeSavedAndSyncedData(nbtTags, provider);
         nbtTags.put("main", NbtUtils.writeBlockPos(this.getMainPos()));
         nbtTags.putBoolean("receivedCoords", this.receivedCoords);
     }
